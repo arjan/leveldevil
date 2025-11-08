@@ -45,7 +45,11 @@ export class GameScene extends Phaser.Scene {
     const spawnObj = spawns?.objects.find(obj => obj.name === 'PlayerSpawn');
     
     if (spawnObj) {
-      this.spawnPoint = { x: spawnObj.x!, y: spawnObj.y! };
+      // Spawn at the center of the spawn object
+      this.spawnPoint = { 
+        x: spawnObj.x! + (spawnObj.width! / 2), 
+        y: spawnObj.y! + (spawnObj.height! / 2) 
+      };
     } else {
       // Fallback spawn
       this.spawnPoint = { x: 100, y: 200 };
