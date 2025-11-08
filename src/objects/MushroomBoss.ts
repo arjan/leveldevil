@@ -7,12 +7,14 @@ export class MushroomBoss extends Phaser.Physics.Arcade.Sprite {
   private health: number = 10; // Boss has 10 health
   private isAttacking: boolean = false;
   private attackTimer: number = 0;
-  private attackCooldown: number = 3000; // 3 seconds between attacks
+  private attackCooldown: number = 2000; // 2 seconds between attacks
   private jumpTimer: number = 0;
   private jumpCooldown: number = 5000; // Jump every 5 seconds
   private canJump: boolean = true;
   private lastDirectionChangeTime: number = 0;
   private directionChangeCooldown: number = 500; // Wait 500ms before changing direction again
+  private playerRef: Phaser.Physics.Arcade.Sprite | null = null;
+  private bulletsGroup: Phaser.GameObjects.Group | null = null;
 
   constructor(
     scene: Phaser.Scene,
@@ -143,28 +145,53 @@ export class MushroomBoss extends Phaser.Physics.Arcade.Sprite {
       }
     }
 
-    // Special attack: Speed boost every 3 seconds
+    // Special attack: Shoot bullets every 2 seconds
     if (this.attackTimer >= this.attackCooldown) {
-      this.isAttacking = true;
+      this.shootBullet();
       this.attackTimer = 0;
-      
-      // Speed boost for 1 second
-      this.scene.time.delayedCall(1000, () => {
-        this.isAttacking = false;
-      });
     }
 
-    // Special ability: Jump every 5 seconds
-    if (this.jumpTimer >= this.jumpCooldown && this.canJump && body.blocked.down) {
-      body.setVelocityY(-400); // Jump
-      this.jumpTimer = 0;
-      this.canJump = false;
+  private shootBullet(): void {
+    if (!this.bulletsGroup) return;
+
+    // Aim generally at player with some randomness
+    let shootDirection = this.direction; // Default to facing direction
+    
+    if (this.playerRef && this.playerRef.active) {
+      // Calculate angle to player
+      const dx = this.playerRef.x - this.x;
+      const randomOffset = (Math.random() - 0.5) * 60; // Random offset to make it less accurate
       
-      // Can jump again after landing
-      this.scene.time.delayedCall(1000, () => {
-        this.canJump = true;
-      });
+      if (dx + randomOffset > 0) {
+        shootDirection = 1;
+      } else {
+        shootDirection = -1;
+      }
     }
+
+    // Create bullet sprite
+    const bullet = this.scene.add.sprite(
+      this.x + (shootDirection === 1 ? 40 : -40),
+      this.y,
+      'spike' // Reuse spike sprite as bullet
+    );
+    bullet.setScale(0.8);
+    
+    // Add physics
+    this.scene.physics.add.existing(bullet);
+    const bulletBody = bullet.body as Phaser.Physics.Arcade.Body;
+    bulletBody.setAllowGravity(false);
+    bulletBody.setVelocityX(200 * shootDirection);
+    
+    // Add to group
+    this.bulletsGroup.add(bullet);
+    
+    // Auto-destroy after 5 seconds
+    this.scene.time.delayedCall(5000, () => {
+      if (bullet.active) {
+        bullet.destroy();
+      }
+    });
   }
 
   takeDamage(): void {

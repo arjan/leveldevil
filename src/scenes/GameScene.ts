@@ -345,6 +345,8 @@ export class GameScene extends Phaser.Scene {
           enemyObj.y! + (enemyObj.height || 0) / 2,
           this.groundLayer
         );
+        this.boss.setPlayer(this.player);
+        this.boss.setBulletsGroup(this.bullets);
       }
     });
   }
