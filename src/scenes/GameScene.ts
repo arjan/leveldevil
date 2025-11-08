@@ -26,14 +26,14 @@ export class GameScene extends Phaser.Scene {
 
     // Create layers
     this.groundLayer = this.map.createLayer('Ground', tileset)!;
-    this.groundLayer.setCollisionBetween(1, 72); // All tiles can collide
+    this.groundLayer.setCollisionByExclusion([-1, 0]); // Only non-empty tiles collide
 
     this.hiddenLayer = this.map.createLayer('Hidden', tileset)!;
     this.hiddenLayer.setVisible(false);
     // Don't enable collision yet - will be enabled when revealed
 
     this.spikesLayer = this.map.createLayer('Spikes', tileset)!;
-    this.spikesLayer.setCollisionBetween(1, 72); // All spike tiles collide
+    this.spikesLayer.setCollisionByExclusion([-1, 0]); // Only non-empty tiles collide
     this.spikesLayer.setTint(0xff4444); // Red tint to make spikes visible
 
     // Set world bounds to match map size
@@ -66,8 +66,7 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.player, this.groundLayer);
     this.physics.add.collider(this.player, this.hiddenLayer);
     
-    // Spike collision with death callback (temporarily disabled for testing)
-    /* 
+    // Spike collision with death callback
     this.physics.add.overlap(
       this.player,
       this.spikesLayer,
@@ -79,7 +78,6 @@ export class GameScene extends Phaser.Scene {
       undefined,
       this
     );
-    */
 
     // Setup trigger zones for revealing hidden walls
     this.setupTriggers();
@@ -115,7 +113,7 @@ export class GameScene extends Phaser.Scene {
             this.hiddenLayer.setVisible(true);
             
             // Enable collision on hidden layer
-            this.hiddenLayer.setCollisionBetween(1, 72);
+            this.hiddenLayer.setCollisionByExclusion([-1, 0]);
             
             // Destroy the zone so it only triggers once
             zone.destroy();
