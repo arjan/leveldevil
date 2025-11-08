@@ -17,10 +17,10 @@ export class GameScene extends Phaser.Scene {
   }
 
   create(): void {
-    // Add background
-    this.add.tileSprite(0, 0, this.cameras.main.width * 10, this.cameras.main.height * 10, 'background')
-      .setOrigin(0, 0)
-      .setScrollFactor(0.5); // Parallax effect
+    // Add background - fill the entire map area
+    const bg = this.add.image(0, 0, 'background').setOrigin(0, 0);
+    bg.setDisplaySize(this.cameras.main.width, this.cameras.main.height);
+    bg.setScrollFactor(0);
 
     // Create tilemap
     this.map = this.make.tilemap({ key: 'level1' });

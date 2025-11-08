@@ -52,7 +52,7 @@ export class PreloadScene extends Phaser.Scene {
     this.load.image('background', 'assets/Background/Purple.png');
 
     // Load UI
-    this.load.image('heart', 'assets/Items/Fruits/Cherries.png'); // Using cherries as heart
+    this.load.image('heart', 'assets/Items/Fruits/Strawberry.png'); // Using strawberry as heart
 
     // Load player sprites
     this.load.spritesheet('player-idle', 'assets/sprites/player-idle.png', {
