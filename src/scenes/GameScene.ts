@@ -56,6 +56,19 @@ export class GameScene extends Phaser.Scene {
       y: this.spawnPoint.y,
     });
 
+    // Setup collisions
+    this.physics.add.collider(this.player, this.groundLayer);
+    this.physics.add.collider(this.player, this.hiddenLayer);
+    
+    // Spike collision with death callback
+    this.physics.add.collider(
+      this.player,
+      this.spikesLayer,
+      () => this.onDeath(),
+      undefined,
+      this
+    );
+
     // Camera setup
     this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
