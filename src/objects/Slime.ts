@@ -1,11 +1,14 @@
 import Phaser from 'phaser';
 
 export class Slime extends Phaser.Physics.Arcade.Sprite {
-  private speed: number = 30;
+  private speed: number = 50;
   private direction: number = 1; // 1 for right, -1 for left
+  private groundLayer: Phaser.Tilemaps.TilemapLayer;
 
-  constructor(scene: Phaser.Scene, x: number, y: number) {
+  constructor(scene: Phaser.Scene, x: number, y: number, groundLayer: Phaser.Tilemaps.TilemapLayer) {
     super(scene, x, y, 'slime-idle');
+
+    this.groundLayer = groundLayer;
 
     // Add to scene
     scene.add.existing(this);
@@ -50,14 +53,33 @@ export class Slime extends Phaser.Physics.Arcade.Sprite {
   update(): void {
     const body = this.body as Phaser.Physics.Arcade.Body;
 
+    // Only move if on ground
+    if (!body.blocked.down) {
+      return;
+    }
+
     // Move in current direction
     body.setVelocityX(this.speed * this.direction);
 
     // Flip sprite based on direction
     this.setFlipX(this.direction === -1);
 
-    // Check if we hit a wall or edge
-    if (body.blocked.right || body.blocked.left) {
+    // Check for walls
+    if (body.blocked.right && this.direction === 1) {
+      this.direction = -1;
+    } else if (body.blocked.left && this.direction === -1) {
+      this.direction = 1;
+    }
+
+    // Check for edges (raycast down in front of slime)
+    const checkDistance = 20; // pixels ahead to check
+    const checkX = this.direction === 1 ? this.x + checkDistance : this.x - checkDistance;
+    const checkY = this.y + 16; // below the slime
+
+    const tile = this.groundLayer.getTileAtWorldXY(checkX, checkY);
+    
+    // If no tile ahead (edge detected), turn around
+    if (!tile || tile.index <= 0) {
       this.direction *= -1;
     }
   }

@@ -182,7 +182,8 @@ export class GameScene extends Phaser.Scene {
         const slime = new Slime(
           this,
           enemyObj.x! + (enemyObj.width || 0) / 2,
-          enemyObj.y! + (enemyObj.height || 0) / 2
+          enemyObj.y! + (enemyObj.height || 0) / 2,
+          this.groundLayer
         );
         this.slimes.add(slime);
       }
