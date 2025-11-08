@@ -7243,6 +7243,17 @@
    "name": "Enemies",
    "objects": [
     {
+     "height": 128,
+     "id": 15,
+     "name": "MushroomBoss",
+     "rotation": 0,
+     "type": "boss",
+     "visible": true,
+     "width": 128,
+     "x": 1500,
+     "y": 144
+    },
+    {
      "height": 30,
      "id": 11,
      "name": "Slime",
@@ -7307,7 +7318,7 @@
   }
  ],
  "nextlayerid": 8,
- "nextobjectid": 15,
+ "nextobjectid": 16,
  "orientation": "orthogonal",
  "properties": [
   {

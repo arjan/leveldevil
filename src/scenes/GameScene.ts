@@ -2,6 +2,7 @@ import Phaser from 'phaser';
 import { Player } from '../objects/Player';
 import { Slime } from '../objects/Slime';
 import { Trunk, TrunkBullet } from '../objects/Trunk';
+import { MushroomBoss } from '../objects/MushroomBoss';
 
 export class GameScene extends Phaser.Scene {
   private map!: Phaser.Tilemaps.Tilemap;
@@ -21,6 +22,7 @@ export class GameScene extends Phaser.Scene {
   private trunks: Phaser.GameObjects.Group;
   private bullets: Phaser.GameObjects.Group;
   private spikes: Phaser.GameObjects.Group;
+  private boss: MushroomBoss | null = null;
 
   constructor() {
     super({ key: 'GameScene' });
@@ -145,6 +147,7 @@ export class GameScene extends Phaser.Scene {
     // Spawn enemies from object layer
     this.spawnSlimes();
     this.spawnTrunks();
+    this.spawnBoss();
 
     // Setup collisions
     this.physics.add.collider(this.player, this.groundLayer);
@@ -226,6 +229,37 @@ export class GameScene extends Phaser.Scene {
       this
     );
 
+    // Boss collisions
+    if (this.boss) {
+      this.physics.add.collider(this.boss, this.groundLayer);
+      this.physics.add.collider(this.boss, this.hiddenLayer);
+
+      // Player hits boss from above
+      this.physics.add.overlap(
+        this.player,
+        this.boss,
+        (player, boss) => {
+          const playerBody = player.body as Phaser.Physics.Arcade.Body;
+          const bossSprite = boss as MushroomBoss;
+
+          // If player is falling and hits from above
+          if (playerBody.velocity.y > 0 && player.y < boss.y - 20) {
+            // Bounce player higher for boss
+            playerBody.setVelocityY(-400);
+            // Damage boss
+            bossSprite.takeDamage();
+          } else {
+            // Player gets hurt
+            if (!this.isDead) {
+              this.takeDamage();
+            }
+          }
+        },
+        undefined,
+        this
+      );
+    }
+
     // Spike collision with death callback
     this.physics.add.overlap(
       this.player,
@@ -295,6 +329,22 @@ export class GameScene extends Phaser.Scene {
         );
         trunk.setPlayer(this.player);
         this.trunks.add(trunk);
+      }
+    });
+  }
+
+  private spawnBoss(): void {
+    const enemiesLayer = this.map.getObjectLayer('Enemies');
+    if (!enemiesLayer) return;
+
+    enemiesLayer.objects.forEach(enemyObj => {
+      if (enemyObj.type === 'boss' || enemyObj.name === 'MushroomBoss') {
+        this.boss = new MushroomBoss(
+          this,
+          enemyObj.x! + (enemyObj.width || 0) / 2,
+          enemyObj.y! + (enemyObj.height || 0) / 2,
+          this.groundLayer
+        );
       }
     });
   }
@@ -437,6 +487,11 @@ export class GameScene extends Phaser.Scene {
       }
       return true;
     });
+
+    // Update boss
+    if (this.boss && this.boss.active) {
+      this.boss.update(time, delta);
+    }
   }
 
   takeDamage(): void {
