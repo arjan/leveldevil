@@ -345,8 +345,10 @@ export class GameScene extends Phaser.Scene {
           enemyObj.y! + (enemyObj.height || 0) / 2,
           this.groundLayer
         );
-        this.boss.setPlayer(this.player);
-        this.boss.setBulletsGroup(this.bullets);
+        if (this.boss) {
+          this.boss.setPlayer(this.player);
+          this.boss.setBulletsGroup(this.bullets);
+        }
       }
     });
   }
@@ -447,7 +449,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   nextLevel(): void {
-    if (this.currentLevel >= 10) {
+    if (this.currentLevel >= 11) {
       // Victory!
       this.scene.stop('UIScene');
       this.scene.start('VictoryScene');
