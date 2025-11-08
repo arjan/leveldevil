@@ -7238,32 +7238,21 @@
    "y": 0
   },
   {
-   "draworder": "topdown",
-   "id": 7,
-   "name": "Enemies",
-   "objects": [
-    {
-     "height": 128,
-     "id": 15,
-     "name": "MushroomBoss",
-     "rotation": 0,
-     "type": "boss",
-     "visible": true,
-     "width": 128,
-     "x": 300,
-     "y": 80
-    },
-    {
-     "height": 30,
-     "id": 11,
-     "name": "Slime",
-     "rotation": 0,
-     "type": "slime",
-     "visible": true,
-     "width": 44,
-     "x": 400,
-     "y": 208
-    },
+  "draworder": "topdown",
+  "id": 7,
+  "name": "Enemies",
+  "objects": [
+   {
+    "height": 30,
+    "id": 11,
+    "name": "Slime",
+    "rotation": 0,
+    "type": "slime",
+    "visible": true,
+    "width": 44,
+    "x": 400,
+    "y": 208
+   },
     {
      "height": 30,
      "id": 12,
