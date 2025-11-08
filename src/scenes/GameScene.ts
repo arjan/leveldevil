@@ -66,7 +66,8 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.player, this.groundLayer);
     this.physics.add.collider(this.player, this.hiddenLayer);
     
-    // Spike collision with death callback
+    // Spike collision with death callback (temporarily disabled for testing)
+    /* 
     this.physics.add.overlap(
       this.player,
       this.spikesLayer,
@@ -78,6 +79,7 @@ export class GameScene extends Phaser.Scene {
       undefined,
       this
     );
+    */
 
     // Setup trigger zones for revealing hidden walls
     this.setupTriggers();
