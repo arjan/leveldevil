@@ -28,21 +28,25 @@ export class TrunkBullet extends Phaser.Physics.Arcade.Sprite {
 }
 
 export class Trunk extends Phaser.Physics.Arcade.Sprite {
+  private speed: number = 40;
   private direction: number = -1; // -1 for left, 1 for right
   private shootTimer: number = 0;
   private shootCooldown: number = 2000; // ms between shots
   private detectionRange: number = 300;
   private playerRef: Phaser.Physics.Arcade.Sprite | null = null;
+  private groundLayer: Phaser.Tilemaps.TilemapLayer;
 
   constructor(
     scene: Phaser.Scene,
     x: number,
     y: number,
+    groundLayer: Phaser.Tilemaps.TilemapLayer,
     direction: number = -1
   ) {
     super(scene, x, y, 'trunk-idle');
 
     this.direction = direction;
+    this.groundLayer = groundLayer;
 
     // Add to scene
     scene.add.existing(this);
@@ -54,14 +58,12 @@ export class Trunk extends Phaser.Physics.Arcade.Sprite {
     body.setAllowGravity(true);
     body.setSize(48, 28);
     body.setOffset(8, 4);
-    body.setImmovable(true);
 
     // Create animations if they don't exist
     this.createAnimations();
 
     // Start idle animation
     this.play('trunk-idle');
-    this.setFlipX(direction === 1);
   }
 
   private createAnimations(): void {
@@ -112,10 +114,46 @@ export class Trunk extends Phaser.Physics.Arcade.Sprite {
   update(time: number, delta: number, bullets: Phaser.GameObjects.Group): void {
     if (!this.playerRef || !this.active) return;
 
+    const body = this.body as Phaser.Physics.Arcade.Body;
+
+    // Only move if on ground
+    if (!body.blocked.down) {
+      return;
+    }
+
+    // Patrol movement
+    body.setVelocityX(this.speed * this.direction);
+
+    // Check for walls
+    if (body.blocked.right && this.direction === 1) {
+      this.direction = -1;
+    } else if (body.blocked.left && this.direction === -1) {
+      this.direction = 1;
+    }
+
+    // Check for edges (raycast down in front of trunk)
+    const checkDistance = 30;
+    const checkX = this.direction === 1 ? this.x + checkDistance : this.x - checkDistance;
+    const checkY = this.y + 16;
+
+    const tile = this.groundLayer.getTileAtWorldXY(checkX, checkY);
+    
+    // If no tile ahead (edge detected), turn around
+    if (!tile || tile.index <= 0) {
+      this.direction *= -1;
+    }
+
+    // Always face the player
+    if (this.playerRef.x < this.x) {
+      this.setFlipX(false); // Face left
+    } else {
+      this.setFlipX(true); // Face right
+    }
+
     // Update shoot timer
     this.shootTimer += delta;
 
-    // Check if player is in range and in front of trunk
+    // Check if player is in range
     const distance = Phaser.Math.Distance.Between(
       this.x,
       this.y,
@@ -123,22 +161,17 @@ export class Trunk extends Phaser.Physics.Arcade.Sprite {
       this.playerRef.y
     );
 
-    const playerInFront =
-      (this.direction === -1 && this.playerRef.x < this.x) ||
-      (this.direction === 1 && this.playerRef.x > this.x);
+    // Determine which direction to shoot based on player position
+    const shootDirection = this.playerRef.x < this.x ? -1 : 1;
 
     // Shoot if player is in range and cooldown is ready
-    if (
-      distance < this.detectionRange &&
-      playerInFront &&
-      this.shootTimer >= this.shootCooldown
-    ) {
-      this.shoot(bullets);
+    if (distance < this.detectionRange && this.shootTimer >= this.shootCooldown) {
+      this.shoot(bullets, shootDirection);
       this.shootTimer = 0;
     }
   }
 
-  private shoot(bullets: Phaser.GameObjects.Group): void {
+  private shoot(bullets: Phaser.GameObjects.Group, shootDirection: number): void {
     // Play attack animation
     this.play('trunk-attack');
 
@@ -146,8 +179,8 @@ export class Trunk extends Phaser.Physics.Arcade.Sprite {
     this.scene.time.delayedCall(300, () => {
       const bullet = bullets.get() as TrunkBullet;
       if (bullet) {
-        const offsetX = this.direction === -1 ? -30 : 30;
-        bullet.fire(this.x + offsetX, this.y, this.direction);
+        const offsetX = shootDirection === -1 ? -30 : 30;
+        bullet.fire(this.x + offsetX, this.y, shootDirection);
       }
 
       // Return to idle

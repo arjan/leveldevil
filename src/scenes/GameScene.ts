@@ -185,7 +185,7 @@ export class GameScene extends Phaser.Scene {
     );
 
     // Bullet collisions
-    this.physics.add.collider(this.bullets, this.groundLayer, (bullet) => {
+    this.physics.add.collider(this.bullets, this.groundLayer, bullet => {
       bullet.destroy();
     });
 
@@ -262,11 +262,12 @@ export class GameScene extends Phaser.Scene {
       if (enemyObj.type === 'trunk' || enemyObj.name === 'Trunk') {
         // Direction from custom property or default to left (-1)
         const direction = (enemyObj.properties as any)?.direction || -1;
-        
+
         const trunk = new Trunk(
           this,
           enemyObj.x! + (enemyObj.width || 0) / 2,
           enemyObj.y! + (enemyObj.height || 0) / 2,
+          this.groundLayer,
           direction
         );
         trunk.setPlayer(this.player);
@@ -394,7 +395,7 @@ export class GameScene extends Phaser.Scene {
     }
 
     // Update trunks manually
-    this.trunks.children.each((trunk) => {
+    this.trunks.children.each(trunk => {
       const trunkSprite = trunk as Trunk;
       if (trunkSprite.active) {
         trunkSprite.update(time, delta, this.bullets);
