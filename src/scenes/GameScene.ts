@@ -20,6 +20,7 @@ export class GameScene extends Phaser.Scene {
   private slimes: Phaser.GameObjects.Group;
   private trunks: Phaser.GameObjects.Group;
   private bullets: Phaser.GameObjects.Group;
+  private spikes: Phaser.GameObjects.Group;
 
   constructor() {
     super({ key: 'GameScene' });
@@ -80,16 +81,26 @@ export class GameScene extends Phaser.Scene {
     // Don't enable collision yet - will be enabled when revealed
 
     this.spikesLayer = this.map.createLayer('Spikes', tileset)!;
-    const spikeTiles = new Set<number>();
+    this.spikesLayer.setVisible(false); // Hide the tile layer, we'll use sprites instead
+
+    // Create spike sprites group
+    this.spikes = this.add.group();
+
+    // Convert spike tiles to sprites
     this.spikesLayer.forEachTile(tile => {
       if (tile.index > 0) {
-        spikeTiles.add(tile.index);
+        // Create spike sprite at tile position
+        const spike = this.add.sprite(
+          tile.x * 16 + 8,
+          tile.y * 16 + 8,
+          'spike',
+          0
+        );
+        spike.setOrigin(0.5, 0.5);
+        this.physics.add.existing(spike, true); // Static body
+        this.spikes.add(spike);
       }
     });
-    if (spikeTiles.size > 0) {
-      this.spikesLayer.setCollision(Array.from(spikeTiles));
-    }
-    // Don't tint - let the spike tiles show naturally
 
     // Set world bounds to match map size
     this.physics.world.bounds.width = this.map.widthInPixels;
@@ -223,10 +234,9 @@ export class GameScene extends Phaser.Scene {
     // Spike collision with death callback
     this.physics.add.overlap(
       this.player,
-      this.spikesLayer,
-      (player, tile) => {
-        const spikeTile = tile as Phaser.Tilemaps.Tile;
-        if (!this.isInvulnerable && spikeTile.index > 0) {
+      this.spikes,
+      (player, spike) => {
+        if (!this.isInvulnerable && !this.isDead) {
           this.takeDamage();
         }
       },
