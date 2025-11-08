@@ -3,8 +3,9 @@ import Phaser from 'phaser';
 export class UIScene extends Phaser.Scene {
   private deathCount: number = 0;
   private deathText!: Phaser.GameObjects.Text;
+  private levelText!: Phaser.GameObjects.Text;
   private hearts: Phaser.GameObjects.Sprite[] = [];
-
+  
   // Mobile controls
   private leftButton!: Phaser.GameObjects.Graphics;
   private rightButton!: Phaser.GameObjects.Graphics;
@@ -33,10 +34,10 @@ export class UIScene extends Phaser.Scene {
 
     // Hearts display (top-left)
     for (let i = 0; i < 3; i++) {
-      const heart = this.add.sprite(20 + i * 35, 25, 'heart');
+      const heart = this.add.sprite(20 + i * 20, 25, 'heart');
       heart.setScrollFactor(0);
       heart.setDepth(1000);
-      heart.setScale(2);
+      heart.setScale(1);
       heart.play('heart-beat');
       // Randomize starting frame so they don't all animate in sync
       heart.anims.setProgress(Math.random());
@@ -55,6 +56,18 @@ export class UIScene extends Phaser.Scene {
     this.deathText.setScrollFactor(0);
     this.deathText.setDepth(1000);
 
+    // Level display (top-center)
+    this.levelText = this.add.text(this.cameras.main.width / 2, 16, 'Level 1', {
+      fontFamily: 'Arial',
+      fontSize: '28px',
+      color: '#FFD700',
+      stroke: '#000000',
+      strokeThickness: 4,
+    });
+    this.levelText.setOrigin(0.5, 0);
+    this.levelText.setScrollFactor(0);
+    this.levelText.setDepth(1000);
+
     // Detect if mobile/touch device
     this.isMobile = this.sys.game.device.input.touch;
 
@@ -66,6 +79,7 @@ export class UIScene extends Phaser.Scene {
     // Listen for death events from GameScene
     this.game.events.on('playerDeath', this.onPlayerDeath, this);
     this.game.events.on('healthChanged', this.onHealthChanged, this);
+    this.game.events.on('levelChanged', this.onLevelChanged, this);
   }
 
   private setupMobileControls(): void {
@@ -204,8 +218,13 @@ export class UIScene extends Phaser.Scene {
     }
   }
 
+  onLevelChanged(level: number): void {
+    this.levelText.setText(`Level ${level}`);
+  }
+
   shutdown(): void {
     this.game.events.off('playerDeath', this.onPlayerDeath, this);
     this.game.events.off('healthChanged', this.onHealthChanged, this);
+    this.game.events.off('levelChanged', this.onLevelChanged, this);
   }
 }

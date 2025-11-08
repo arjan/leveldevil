@@ -11,19 +11,23 @@ export class GameScene extends Phaser.Scene {
   private isDead: boolean = false;
   private health: number = 3;
   private isInvulnerable: boolean = false;
+  private currentLevel: number = 1;
 
   constructor() {
     super({ key: 'GameScene' });
   }
 
   create(): void {
+    // Get current level from registry
+    this.currentLevel = this.registry.get('currentLevel') || 1;
+    
     // Add background - fill the entire map area
     const bg = this.add.image(0, 0, 'background').setOrigin(0, 0);
     bg.setDisplaySize(this.cameras.main.width, this.cameras.main.height);
     bg.setScrollFactor(0);
 
-    // Create tilemap
-    this.map = this.make.tilemap({ key: 'level1' });
+    // Create tilemap for current level
+    this.map = this.make.tilemap({ key: `level${this.currentLevel}` });
     const tileset = this.map.addTilesetImage('tileset', 'terrain-tileset');
 
     if (!tileset) {
@@ -106,10 +110,16 @@ export class GameScene extends Phaser.Scene {
     // Setup trigger zones for revealing hidden walls
     this.setupTriggers();
 
+    // Setup goal zone
+    this.setupGoal();
+
     // Camera setup
     this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
     // Center camera on player (no deadzone)
+    
+    // Emit level change
+    this.game.events.emit('levelChanged', this.currentLevel);
   }
 
   private setupTriggers(): void {
@@ -153,6 +163,56 @@ export class GameScene extends Phaser.Scene {
     });
   }
 
+  private setupGoal(): void {
+    const goalLayer = this.map.getObjectLayer('Goal');
+    if (!goalLayer) return;
+
+    goalLayer.objects.forEach(goalObj => {
+      if (goalObj.type === 'goal') {
+        // Create a zone for the goal area
+        const zone = this.add.zone(
+          goalObj.x! + goalObj.width! / 2,
+          goalObj.y! + goalObj.height! / 2,
+          goalObj.width!,
+          goalObj.height!
+        );
+        
+        this.physics.add.existing(zone, false);
+
+        // Add overlap detection
+        this.physics.add.overlap(
+          this.player,
+          zone as Phaser.Types.Physics.Arcade.GameObjectWithBody,
+          () => {
+            this.nextLevel();
+          },
+          undefined,
+          this
+        );
+        
+        // Visual indicator for goal
+        const goalGraphics = this.add.graphics();
+        goalGraphics.lineStyle(3, 0xFFD700);
+        goalGraphics.fillStyle(0xFFFF00, 0.3);
+        goalGraphics.fillRect(goalObj.x!, goalObj.y!, goalObj.width!, goalObj.height!);
+        goalGraphics.strokeRect(goalObj.x!, goalObj.y!, goalObj.width!, goalObj.height!);
+      }
+    });
+  }
+
+  nextLevel(): void {
+    if (this.currentLevel >= 10) {
+      // Victory!
+      this.scene.stop('UIScene');
+      this.scene.start('VictoryScene');
+    } else {
+      // Next level
+      this.currentLevel++;
+      this.registry.set('currentLevel', this.currentLevel);
+      this.scene.restart();
+    }
+  }
+
   update(time: number, delta: number): void {
     // Update player
     if (this.player && !this.isDead) {
@@ -190,6 +250,10 @@ export class GameScene extends Phaser.Scene {
   onDeath(): void {
     // Prevent multiple death triggers
     this.isDead = true;
+    
+    // Track total deaths
+    const totalDeaths = this.registry.get('totalDeaths') || 0;
+    this.registry.set('totalDeaths', totalDeaths + 1);
     
     // Emit death event for UI
     this.game.events.emit('playerDeath');

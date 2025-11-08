@@ -46,7 +46,11 @@ export class PreloadScene extends Phaser.Scene {
 
     // Load tilemap and tileset
     this.load.image('terrain-tileset', 'assets/tiles/terrain.png');
-    this.load.tilemapTiledJSON('level1', 'assets/maps/level1.json');
+    
+    // Load all 10 levels
+    for (let i = 1; i <= 10; i++) {
+      this.load.tilemapTiledJSON(`level${i}`, `assets/maps/level${i}.json`);
+    }
 
     // Load background
     this.load.image('background', 'assets/Background/Purple.png');
@@ -77,6 +81,14 @@ export class PreloadScene extends Phaser.Scene {
   }
 
   create(): void {
+    // Initialize game registry
+    if (!this.registry.has('currentLevel')) {
+      this.registry.set('currentLevel', 1);
+    }
+    if (!this.registry.has('totalDeaths')) {
+      this.registry.set('totalDeaths', 0);
+    }
+    
     // Start the game scene
     this.scene.start('GameScene');
     this.scene.launch('UIScene');
