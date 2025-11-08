@@ -4,7 +4,7 @@ export class UIScene extends Phaser.Scene {
   private deathCount: number = 0;
   private deathText!: Phaser.GameObjects.Text;
   private hearts: Phaser.GameObjects.Sprite[] = [];
-  
+
   // Mobile controls
   private leftButton!: Phaser.GameObjects.Graphics;
   private rightButton!: Phaser.GameObjects.Graphics;
@@ -38,6 +38,8 @@ export class UIScene extends Phaser.Scene {
       heart.setDepth(1000);
       heart.setScale(2);
       heart.play('heart-beat');
+      // Randomize starting frame so they don't all animate in sync
+      heart.anims.setProgress(Math.random());
       this.hearts.push(heart);
     }
 
