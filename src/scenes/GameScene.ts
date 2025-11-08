@@ -13,6 +13,7 @@ export class GameScene extends Phaser.Scene {
   private isInvulnerable: boolean = false;
   private currentLevel: number = 1;
   private debugInvincible: boolean = false;
+  private levelCompleted: boolean = false;
 
   constructor() {
     super({ key: 'GameScene' });
@@ -125,7 +126,6 @@ export class GameScene extends Phaser.Scene {
     // Setup debug controls
     this.input.keyboard!.on('keydown-I', () => {
       this.debugInvincible = !this.debugInvincible;
-      console.log(`Debug Invincibility: ${this.debugInvincible ? 'ON' : 'OFF'}`);
       this.game.events.emit('debugInvincibilityChanged', this.debugInvincible);
     });
   }
@@ -176,34 +176,51 @@ export class GameScene extends Phaser.Scene {
     if (!goalLayer) return;
 
     goalLayer.objects.forEach(goalObj => {
-      if (goalObj.type === 'goal') {
+      if (goalObj.type === 'goal' || goalObj.name === 'LevelGoal') {
+        // Make the zone taller to ensure we catch the player
+        const goalHeight = (goalObj.height || 64) * 2;
+        const goalWidth = goalObj.width || 64;
+        const goalX = goalObj.x || 0;
+        const goalY = (goalObj.y || 0) - goalHeight / 2;
+        
         // Create a zone for the goal area
         const zone = this.add.zone(
-          goalObj.x! + goalObj.width! / 2,
-          goalObj.y! + goalObj.height! / 2,
-          goalObj.width!,
-          goalObj.height!
+          goalX + goalWidth / 2,
+          goalY + goalHeight / 2,
+          goalWidth,
+          goalHeight
         );
         
         this.physics.add.existing(zone, false);
+        const zoneBody = zone.body as Phaser.Physics.Arcade.Body;
+        zoneBody.setAllowGravity(false);
 
         // Add overlap detection
         this.physics.add.overlap(
           this.player,
           zone as Phaser.Types.Physics.Arcade.GameObjectWithBody,
           () => {
-            this.nextLevel();
+            if (!this.levelCompleted) {
+              this.levelCompleted = true;
+              this.nextLevel();
+            }
           },
           undefined,
           this
         );
         
-        // Visual indicator for goal
+        // Visual indicator for goal - make it more visible
         const goalGraphics = this.add.graphics();
-        goalGraphics.lineStyle(3, 0xFFD700);
-        goalGraphics.fillStyle(0xFFFF00, 0.3);
-        goalGraphics.fillRect(goalObj.x!, goalObj.y!, goalObj.width!, goalObj.height!);
-        goalGraphics.strokeRect(goalObj.x!, goalObj.y!, goalObj.width!, goalObj.height!);
+        goalGraphics.lineStyle(4, 0xFFD700);
+        goalGraphics.fillStyle(0xFFFF00, 0.5);
+        goalGraphics.fillRect(goalX, goalY, goalWidth, goalHeight);
+        goalGraphics.strokeRect(goalX, goalY, goalWidth, goalHeight);
+        
+        // Add vertical stripes for extra visibility
+        goalGraphics.lineStyle(2, 0xFFD700, 0.7);
+        for (let i = 0; i < goalWidth; i += 8) {
+          goalGraphics.lineBetween(goalX + i, goalY, goalX + i, goalY + goalHeight);
+        }
       }
     });
   }
@@ -217,6 +234,10 @@ export class GameScene extends Phaser.Scene {
       // Next level
       this.currentLevel++;
       this.registry.set('currentLevel', this.currentLevel);
+      
+      // Save to localStorage
+      localStorage.setItem('leveldevil_currentLevel', this.currentLevel.toString());
+      
       this.scene.restart();
     }
   }
@@ -262,6 +283,9 @@ export class GameScene extends Phaser.Scene {
     // Track total deaths
     const totalDeaths = this.registry.get('totalDeaths') || 0;
     this.registry.set('totalDeaths', totalDeaths + 1);
+    
+    // Save to localStorage
+    localStorage.setItem('leveldevil_totalDeaths', (totalDeaths + 1).toString());
     
     // Emit death event for UI
     this.game.events.emit('playerDeath');

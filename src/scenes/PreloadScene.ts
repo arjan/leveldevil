@@ -82,10 +82,19 @@ export class PreloadScene extends Phaser.Scene {
 
   create(): void {
     // Initialize game registry
-    if (!this.registry.has('currentLevel')) {
+    // Try to load from localStorage first
+    const savedLevel = localStorage.getItem('leveldevil_currentLevel');
+    const savedDeaths = localStorage.getItem('leveldevil_totalDeaths');
+    
+    if (savedLevel && !isNaN(parseInt(savedLevel))) {
+      this.registry.set('currentLevel', parseInt(savedLevel));
+    } else if (!this.registry.has('currentLevel')) {
       this.registry.set('currentLevel', 1);
     }
-    if (!this.registry.has('totalDeaths')) {
+    
+    if (savedDeaths && !isNaN(parseInt(savedDeaths))) {
+      this.registry.set('totalDeaths', parseInt(savedDeaths));
+    } else if (!this.registry.has('totalDeaths')) {
       this.registry.set('totalDeaths', 0);
     }
     
