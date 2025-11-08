@@ -13359,6 +13359,172 @@
   },
   {
    "draworder": "topdown",
+   "id": 7,
+   "name": "Enemies",
+   "objects": [
+    {
+     "height": 30,
+     "id": 300,
+     "name": "Slime",
+     "rotation": 0,
+     "type": "slime",
+     "visible": true,
+     "width": 44,
+     "x": 378,
+     "y": 208
+    },
+    {
+     "height": 30,
+     "id": 301,
+     "name": "Slime",
+     "rotation": 0,
+     "type": "slime",
+     "visible": true,
+     "width": 44,
+     "x": 756,
+     "y": 208
+    },
+    {
+     "height": 30,
+     "id": 302,
+     "name": "Slime",
+     "rotation": 0,
+     "type": "slime",
+     "visible": true,
+     "width": 44,
+     "x": 1134,
+     "y": 208
+    },
+    {
+     "height": 30,
+     "id": 303,
+     "name": "Slime",
+     "rotation": 0,
+     "type": "slime",
+     "visible": true,
+     "width": 44,
+     "x": 1512,
+     "y": 208
+    },
+    {
+     "height": 30,
+     "id": 304,
+     "name": "Slime",
+     "rotation": 0,
+     "type": "slime",
+     "visible": true,
+     "width": 44,
+     "x": 1890,
+     "y": 208
+    },
+    {
+     "height": 30,
+     "id": 305,
+     "name": "Slime",
+     "rotation": 0,
+     "type": "slime",
+     "visible": true,
+     "width": 44,
+     "x": 2268,
+     "y": 208
+    },
+    {
+     "height": 30,
+     "id": 306,
+     "name": "Slime",
+     "rotation": 0,
+     "type": "slime",
+     "visible": true,
+     "width": 44,
+     "x": 2646,
+     "y": 208
+    },
+    {
+     "height": 30,
+     "id": 307,
+     "name": "Slime",
+     "rotation": 0,
+     "type": "slime",
+     "visible": true,
+     "width": 44,
+     "x": 3024,
+     "y": 208
+    },
+    {
+     "height": 30,
+     "id": 308,
+     "name": "Slime",
+     "rotation": 0,
+     "type": "slime",
+     "visible": true,
+     "width": 44,
+     "x": 3402,
+     "y": 208
+    },
+    {
+     "height": 30,
+     "id": 309,
+     "name": "Slime",
+     "rotation": 0,
+     "type": "slime",
+     "visible": true,
+     "width": 44,
+     "x": 3780,
+     "y": 208
+    },
+    {
+     "height": 32,
+     "id": 400,
+     "name": "Trunk",
+     "rotation": 0,
+     "type": "trunk",
+     "visible": true,
+     "width": 64,
+     "x": 1248.0,
+     "y": 208
+    },
+    {
+     "height": 32,
+     "id": 401,
+     "name": "Trunk",
+     "rotation": 0,
+     "type": "trunk",
+     "visible": true,
+     "width": 64,
+     "x": 2080.0,
+     "y": 208
+    },
+    {
+     "height": 32,
+     "id": 402,
+     "name": "Trunk",
+     "rotation": 0,
+     "type": "trunk",
+     "visible": true,
+     "width": 64,
+     "x": 2912.0,
+     "y": 208
+    },
+    {
+     "height": 32,
+     "id": 403,
+     "name": "Trunk",
+     "rotation": 0,
+     "type": "trunk",
+     "visible": true,
+     "width": 64,
+     "x": 3744.0,
+     "y": 208
+    }
+   ],
+   "opacity": 1,
+   "type": "objectgroup",
+   "visible": true,
+   "x": 0,
+   "y": 0
+  },
+  {
+   "draworder": "topdown",
    "id": 6,
    "name": "Goal",
    "objects": [
@@ -13382,7 +13548,7 @@
   }
  ],
  "nextlayerid": 7,
- "nextobjectid": 11,
+ "nextobjectid": 500,
  "orientation": "orthogonal",
  "renderorder": "right-down",
  "tiledversion": "1.11.0",
@@ -13405,5 +13571,12 @@
  "tilewidth": 16,
  "type": "map",
  "version": "1.10",
- "width": 260
+ "width": 260,
+ "properties": [
+  {
+   "name": "background",
+   "type": "string",
+   "value": "Gray"
+  }
+ ]
 }

@@ -52,8 +52,14 @@ export class PreloadScene extends Phaser.Scene {
       this.load.tilemapTiledJSON(`level${i}`, `assets/maps/level${i}.json`);
     }
 
-    // Load background
-    this.load.image('background', 'assets/Background/Purple.png');
+    // Load all background images
+    this.load.image('background-Blue', 'assets/Background/Blue.png');
+    this.load.image('background-Brown', 'assets/Background/Brown.png');
+    this.load.image('background-Gray', 'assets/Background/Gray.png');
+    this.load.image('background-Green', 'assets/Background/Green.png');
+    this.load.image('background-Pink', 'assets/Background/Pink.png');
+    this.load.image('background-Purple', 'assets/Background/Purple.png');
+    this.load.image('background-Yellow', 'assets/Background/Yellow.png');
 
     // Load UI
     this.load.spritesheet('heart', 'assets/Items/Fruits/Strawberry.png', {

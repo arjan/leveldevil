@@ -10445,5 +10445,12 @@
  "tilewidth": 16,
  "type": "map",
  "version": "1.10",
- "width": 200
+ "width": 200,
+ "properties": [
+  {
+   "name": "background",
+   "type": "string",
+   "value": "Pink"
+  }
+ ]
 }

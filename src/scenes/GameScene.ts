@@ -36,11 +36,6 @@ export class GameScene extends Phaser.Scene {
     this.maxHealth = this.registry.get('maxHealth') || 3;
     this.health = this.maxHealth; // Start each level with full health
 
-    // Add background - fill the entire map area
-    const bg = this.add.image(0, 0, 'background').setOrigin(0, 0);
-    bg.setDisplaySize(this.cameras.main.width, this.cameras.main.height);
-    bg.setScrollFactor(0);
-
     // Create tilemap for current level
     this.map = this.make.tilemap({ key: `level${this.currentLevel}` });
     const tileset = this.map.addTilesetImage('tileset', 'terrain-tileset');
@@ -49,6 +44,24 @@ export class GameScene extends Phaser.Scene {
       console.error('Failed to load tileset');
       return;
     }
+
+    // Get background name from map properties
+    let backgroundName = 'Blue'; // Default
+    if (this.map.properties) {
+      const bgProp = this.map.properties.find((p: any) => p.name === 'background');
+      if (bgProp) {
+        backgroundName = bgProp.value;
+      }
+    }
+
+    // Add tiled background that repeats
+    const bgKey = `background-${backgroundName}`;
+    const bgWidth = this.cameras.main.width * 3;
+    const bgHeight = this.cameras.main.height * 3;
+    const bg = this.add.tileSprite(0, 0, bgWidth, bgHeight, bgKey);
+    bg.setOrigin(0, 0);
+    bg.setScrollFactor(0.3); // Parallax effect
+    bg.setDepth(-1);
 
     // Create layers
     this.groundLayer = this.map.createLayer('Ground', tileset)!;
@@ -386,14 +399,14 @@ export class GameScene extends Phaser.Scene {
       if (this.maxHealth < 10) {
         this.maxHealth++;
         this.registry.set('maxHealth', this.maxHealth);
-        
+
         // Save to localStorage
         localStorage.setItem('leveldevil_maxHealth', this.maxHealth.toString());
-        
+
         // Show notification
         console.log(`Max health increased to ${this.maxHealth}!`);
       }
-      
+
       // Next level
       this.currentLevel++;
       this.registry.set('currentLevel', this.currentLevel);

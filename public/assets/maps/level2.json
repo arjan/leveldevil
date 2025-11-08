@@ -8372,5 +8372,12 @@
  "tilewidth": 16,
  "type": "map",
  "version": "1.10",
- "width": 160
+ "width": 160,
+ "properties": [
+  {
+   "name": "background",
+   "type": "string",
+   "value": "Green"
+  }
+ ]
 }

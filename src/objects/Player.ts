@@ -17,7 +17,7 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
 
   // Movement constants
   private readonly SPEED = 200;
-  private readonly JUMP_VELOCITY = -450;
+  private readonly JUMP_VELOCITY = -500; // Increased from -450
   private readonly COYOTE_TIME = 80; // ms
   private readonly JUMP_BUFFER_TIME = 100; // ms
 
