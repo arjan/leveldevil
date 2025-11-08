@@ -17,6 +17,11 @@ export class UIScene extends Phaser.Scene {
   public virtualRight: boolean = false;
   public virtualJump: boolean = false;
 
+  // Track active pointers for multi-touch
+  private leftButtonPointer: number = -1;
+  private rightButtonPointer: number = -1;
+  private jumpButtonPointer: number = -1;
+
   constructor() {
     super({ key: 'UIScene' });
   }
@@ -141,71 +146,134 @@ export class UIScene extends Phaser.Scene {
       Phaser.Geom.Rectangle.Contains
     );
 
-    // Setup touch events
-    this.leftButton.on('pointerdown', () => {
-      this.virtualLeft = true;
-      this.leftButton.clear();
-      this.leftButton.fillStyle(0x666666, buttonAlpha + 0.2);
-      this.leftButton.fillRoundedRect(20, height - buttonSize - 20, buttonSize, buttonSize, 10);
-      this.leftButton.fillStyle(0xffffff, 0.8);
-      this.leftButton.fillTriangle(35, height - 50, 55, height - 40, 55, height - 60);
+    // Setup touch events with multi-touch support
+    // LEFT BUTTON
+    this.leftButton.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      if (this.leftButtonPointer === -1) {
+        this.leftButtonPointer = pointer.id;
+        this.virtualLeft = true;
+        this.leftButton.clear();
+        this.leftButton.fillStyle(0x666666, buttonAlpha + 0.2);
+        this.leftButton.fillRoundedRect(20, height - buttonSize - 20, buttonSize, buttonSize, 10);
+        this.leftButton.fillStyle(0xffffff, 0.8);
+        this.leftButton.fillTriangle(35, height - 50, 55, height - 40, 55, height - 60);
+      }
     });
 
-    this.leftButton.on('pointerup', () => {
-      this.virtualLeft = false;
-      this.leftButton.clear();
-      this.leftButton.fillStyle(0x444444, buttonAlpha);
-      this.leftButton.fillRoundedRect(20, height - buttonSize - 20, buttonSize, buttonSize, 10);
-      this.leftButton.fillStyle(0xffffff, 0.8);
-      this.leftButton.fillTriangle(35, height - 50, 55, height - 40, 55, height - 60);
+    this.leftButton.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+      if (pointer.id === this.leftButtonPointer) {
+        this.leftButtonPointer = -1;
+        this.virtualLeft = false;
+        this.leftButton.clear();
+        this.leftButton.fillStyle(0x444444, buttonAlpha);
+        this.leftButton.fillRoundedRect(20, height - buttonSize - 20, buttonSize, buttonSize, 10);
+        this.leftButton.fillStyle(0xffffff, 0.8);
+        this.leftButton.fillTriangle(35, height - 50, 55, height - 40, 55, height - 60);
+      }
     });
 
-    this.rightButton.on('pointerdown', () => {
-      this.virtualRight = true;
-      this.rightButton.clear();
-      this.rightButton.fillStyle(0x666666, buttonAlpha + 0.2);
-      this.rightButton.fillRoundedRect(100, height - buttonSize - 20, buttonSize, buttonSize, 10);
-      this.rightButton.fillStyle(0xffffff, 0.8);
-      this.rightButton.fillTriangle(145, height - 50, 125, height - 40, 125, height - 60);
+    this.leftButton.on('pointerout', (pointer: Phaser.Input.Pointer) => {
+      if (pointer.id === this.leftButtonPointer) {
+        this.leftButtonPointer = -1;
+        this.virtualLeft = false;
+        this.leftButton.clear();
+        this.leftButton.fillStyle(0x444444, buttonAlpha);
+        this.leftButton.fillRoundedRect(20, height - buttonSize - 20, buttonSize, buttonSize, 10);
+        this.leftButton.fillStyle(0xffffff, 0.8);
+        this.leftButton.fillTriangle(35, height - 50, 55, height - 40, 55, height - 60);
+      }
     });
 
-    this.rightButton.on('pointerup', () => {
-      this.virtualRight = false;
-      this.rightButton.clear();
-      this.rightButton.fillStyle(0x444444, buttonAlpha);
-      this.rightButton.fillRoundedRect(100, height - buttonSize - 20, buttonSize, buttonSize, 10);
-      this.rightButton.fillStyle(0xffffff, 0.8);
-      this.rightButton.fillTriangle(145, height - 50, 125, height - 40, 125, height - 60);
+    // RIGHT BUTTON
+    this.rightButton.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      if (this.rightButtonPointer === -1) {
+        this.rightButtonPointer = pointer.id;
+        this.virtualRight = true;
+        this.rightButton.clear();
+        this.rightButton.fillStyle(0x666666, buttonAlpha + 0.2);
+        this.rightButton.fillRoundedRect(100, height - buttonSize - 20, buttonSize, buttonSize, 10);
+        this.rightButton.fillStyle(0xffffff, 0.8);
+        this.rightButton.fillTriangle(145, height - 50, 125, height - 40, 125, height - 60);
+      }
     });
 
-    this.jumpButton.on('pointerdown', () => {
-      this.virtualJump = true;
-      this.jumpButton.clear();
-      this.jumpButton.fillStyle(0x666666, buttonAlpha + 0.2);
-      this.jumpButton.fillRoundedRect(
-        width - buttonSize - 20,
-        height - buttonSize - 20,
-        buttonSize,
-        buttonSize,
-        10
-      );
-      this.jumpButton.fillStyle(0xffffff, 0.8);
-      this.jumpButton.fillCircle(width - buttonSize / 2 - 20, height - buttonSize / 2 - 20, 15);
+    this.rightButton.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+      if (pointer.id === this.rightButtonPointer) {
+        this.rightButtonPointer = -1;
+        this.virtualRight = false;
+        this.rightButton.clear();
+        this.rightButton.fillStyle(0x444444, buttonAlpha);
+        this.rightButton.fillRoundedRect(100, height - buttonSize - 20, buttonSize, buttonSize, 10);
+        this.rightButton.fillStyle(0xffffff, 0.8);
+        this.rightButton.fillTriangle(145, height - 50, 125, height - 40, 125, height - 60);
+      }
     });
 
-    this.jumpButton.on('pointerup', () => {
-      this.virtualJump = false;
-      this.jumpButton.clear();
-      this.jumpButton.fillStyle(0x444444, buttonAlpha);
-      this.jumpButton.fillRoundedRect(
-        width - buttonSize - 20,
-        height - buttonSize - 20,
-        buttonSize,
-        buttonSize,
-        10
-      );
-      this.jumpButton.fillStyle(0xffffff, 0.8);
-      this.jumpButton.fillCircle(width - buttonSize / 2 - 20, height - buttonSize / 2 - 20, 15);
+    this.rightButton.on('pointerout', (pointer: Phaser.Input.Pointer) => {
+      if (pointer.id === this.rightButtonPointer) {
+        this.rightButtonPointer = -1;
+        this.virtualRight = false;
+        this.rightButton.clear();
+        this.rightButton.fillStyle(0x444444, buttonAlpha);
+        this.rightButton.fillRoundedRect(100, height - buttonSize - 20, buttonSize, buttonSize, 10);
+        this.rightButton.fillStyle(0xffffff, 0.8);
+        this.rightButton.fillTriangle(145, height - 50, 125, height - 40, 125, height - 60);
+      }
+    });
+
+    // JUMP BUTTON
+    this.jumpButton.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
+      if (this.jumpButtonPointer === -1) {
+        this.jumpButtonPointer = pointer.id;
+        this.virtualJump = true;
+        this.jumpButton.clear();
+        this.jumpButton.fillStyle(0x666666, buttonAlpha + 0.2);
+        this.jumpButton.fillRoundedRect(
+          width - buttonSize - 20,
+          height - buttonSize - 20,
+          buttonSize,
+          buttonSize,
+          10
+        );
+        this.jumpButton.fillStyle(0xffffff, 0.8);
+        this.jumpButton.fillCircle(width - buttonSize / 2 - 20, height - buttonSize / 2 - 20, 15);
+      }
+    });
+
+    this.jumpButton.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+      if (pointer.id === this.jumpButtonPointer) {
+        this.jumpButtonPointer = -1;
+        this.virtualJump = false;
+        this.jumpButton.clear();
+        this.jumpButton.fillStyle(0x444444, buttonAlpha);
+        this.jumpButton.fillRoundedRect(
+          width - buttonSize - 20,
+          height - buttonSize - 20,
+          buttonSize,
+          buttonSize,
+          10
+        );
+        this.jumpButton.fillStyle(0xffffff, 0.8);
+        this.jumpButton.fillCircle(width - buttonSize / 2 - 20, height - buttonSize / 2 - 20, 15);
+      }
+    });
+
+    this.jumpButton.on('pointerout', (pointer: Phaser.Input.Pointer) => {
+      if (pointer.id === this.jumpButtonPointer) {
+        this.jumpButtonPointer = -1;
+        this.virtualJump = false;
+        this.jumpButton.clear();
+        this.jumpButton.fillStyle(0x444444, buttonAlpha);
+        this.jumpButton.fillRoundedRect(
+          width - buttonSize - 20,
+          height - buttonSize - 20,
+          buttonSize,
+          buttonSize,
+          10
+        );
+        this.jumpButton.fillStyle(0xffffff, 0.8);
+        this.jumpButton.fillCircle(width - buttonSize / 2 - 20, height - buttonSize / 2 - 20, 15);
+      }
     });
   }
 
