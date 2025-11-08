@@ -33,4 +33,3 @@ export class UIScene extends Phaser.Scene {
     this.game.events.off('playerDeath', this.onPlayerDeath, this);
   }
 }
-

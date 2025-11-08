@@ -44,8 +44,27 @@ export class PreloadScene extends Phaser.Scene {
       percentText.destroy();
     });
 
-    // Load assets (will be populated in later phases)
-    // Placeholder: this ensures the scene transitions properly
+    // Load tilemap and tileset
+    this.load.image('terrain-tileset', 'assets/tiles/terrain.png');
+    this.load.tilemapTiledJSON('level1', 'assets/maps/level1.json');
+
+    // Load player sprites
+    this.load.spritesheet('player-idle', 'assets/sprites/player-idle.png', {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+    this.load.spritesheet('player-run', 'assets/sprites/player-run.png', {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+    this.load.spritesheet('player-jump', 'assets/sprites/player-jump.png', {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
+    this.load.spritesheet('player-fall', 'assets/sprites/player-fall.png', {
+      frameWidth: 32,
+      frameHeight: 32,
+    });
   }
 
   create(): void {

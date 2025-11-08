@@ -24,4 +24,3 @@ export const GameConfig: Phaser.Types.Core.GameConfig = {
   },
   scene: [BootScene, PreloadScene, GameScene, UIScene],
 };
-
