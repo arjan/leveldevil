@@ -105,25 +105,19 @@ export class MushroomBoss extends Phaser.Physics.Arcade.Sprite {
 
     const tile = this.groundLayer.getTileAtWorldXY(checkX, checkY);
 
-    // If no tile ahead (edge detected), turn around and don't move
+    // If no tile ahead (edge detected), turn around
     if (!tile || tile.index <= 0) {
       this.direction *= -1;
-      body.setVelocityX(0);
-      return; // Don't move this frame
     }
 
     // Check for walls
     if (body.blocked.right && this.direction === 1) {
       this.direction = -1;
-      body.setVelocityX(0);
-      return;
     } else if (body.blocked.left && this.direction === -1) {
       this.direction = 1;
-      body.setVelocityX(0);
-      return;
     }
 
-    // Safe to move - patrol movement (faster when attacking)
+    // Patrol movement (faster when attacking)
     const currentSpeed = this.isAttacking ? this.speed * 2 : this.speed;
     body.setVelocityX(currentSpeed * this.direction);
 
