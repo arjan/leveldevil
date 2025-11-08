@@ -4,6 +4,7 @@ export class UIScene extends Phaser.Scene {
   private levelText!: Phaser.GameObjects.Text;
   private debugText!: Phaser.GameObjects.Text;
   private hearts: Phaser.GameObjects.Sprite[] = [];
+  private maxHearts: number = 10;
 
   // Mobile controls
   private leftButton!: Phaser.GameObjects.Graphics;
@@ -31,8 +32,8 @@ export class UIScene extends Phaser.Scene {
       });
     }
 
-    // Hearts display (top-left)
-    for (let i = 0; i < 3; i++) {
+    // Hearts display (top-left) - create max 10 hearts
+    for (let i = 0; i < this.maxHearts; i++) {
       const heart = this.add.sprite(20 + i * 20, 25, 'heart');
       heart.setScrollFactor(0);
       heart.setDepth(1000);
@@ -40,6 +41,7 @@ export class UIScene extends Phaser.Scene {
       heart.play('heart-beat');
       // Randomize starting frame so they don't all animate in sync
       heart.anims.setProgress(Math.random());
+      heart.setVisible(i < 3); // Start with 3 visible
       this.hearts.push(heart);
     }
 
@@ -206,10 +208,17 @@ export class UIScene extends Phaser.Scene {
     });
   }
 
-  onHealthChanged(health: number): void {
-    // Update heart display
+  onHealthChanged(health: number, maxHealth: number): void {
+    // Update heart display based on current and max health
     for (let i = 0; i < this.hearts.length; i++) {
-      this.hearts[i].setVisible(i < health);
+      if (i < maxHealth) {
+        // This heart slot should exist
+        this.hearts[i].setVisible(i < health);
+        this.hearts[i].setAlpha(1); // Full hearts are bright
+      } else {
+        // This heart slot shouldn't exist yet
+        this.hearts[i].setVisible(false);
+      }
     }
   }
 

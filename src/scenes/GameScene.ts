@@ -12,6 +12,7 @@ export class GameScene extends Phaser.Scene {
   private spawnPoint!: { x: number; y: number };
   private isDead: boolean = false;
   private health: number = 3;
+  private maxHealth: number = 3;
   private isInvulnerable: boolean = false;
   private currentLevel: number = 1;
   private debugInvincible: boolean = false;
@@ -30,6 +31,10 @@ export class GameScene extends Phaser.Scene {
 
     // Reset level completion flag
     this.levelCompleted = false;
+
+    // Get max health from registry (increases with level completion)
+    this.maxHealth = this.registry.get('maxHealth') || 3;
+    this.health = this.maxHealth; // Start each level with full health
 
     // Add background - fill the entire map area
     const bg = this.add.image(0, 0, 'background').setOrigin(0, 0);
@@ -377,6 +382,18 @@ export class GameScene extends Phaser.Scene {
       this.scene.stop('UIScene');
       this.scene.start('VictoryScene');
     } else {
+      // Increase max health (up to 10)
+      if (this.maxHealth < 10) {
+        this.maxHealth++;
+        this.registry.set('maxHealth', this.maxHealth);
+        
+        // Save to localStorage
+        localStorage.setItem('leveldevil_maxHealth', this.maxHealth.toString());
+        
+        // Show notification
+        console.log(`Max health increased to ${this.maxHealth}!`);
+      }
+      
       // Next level
       this.currentLevel++;
       this.registry.set('currentLevel', this.currentLevel);
@@ -408,7 +425,7 @@ export class GameScene extends Phaser.Scene {
     if (this.isInvulnerable || this.debugInvincible) return;
 
     this.health--;
-    this.game.events.emit('healthChanged', this.health);
+    this.game.events.emit('healthChanged', this.health, this.maxHealth);
 
     if (this.health <= 0) {
       this.onDeath();
@@ -445,8 +462,8 @@ export class GameScene extends Phaser.Scene {
     // Respawn player
     this.time.delayedCall(1000, () => {
       if (this.player) {
-        this.health = 3;
-        this.game.events.emit('healthChanged', this.health);
+        this.health = this.maxHealth; // Reset to max health
+        this.game.events.emit('healthChanged', this.health, this.maxHealth);
         this.player.respawn(this.spawnPoint.x, this.spawnPoint.y);
         this.isDead = false;
         this.isInvulnerable = false;

@@ -109,19 +109,26 @@ export class PreloadScene extends Phaser.Scene {
     // Try to load from localStorage first
     const savedLevel = localStorage.getItem('leveldevil_currentLevel');
     const savedDeaths = localStorage.getItem('leveldevil_totalDeaths');
-    
+    const savedMaxHealth = localStorage.getItem('leveldevil_maxHealth');
+
     if (savedLevel && !isNaN(parseInt(savedLevel))) {
       this.registry.set('currentLevel', parseInt(savedLevel));
     } else if (!this.registry.has('currentLevel')) {
       this.registry.set('currentLevel', 1);
     }
-    
+
     if (savedDeaths && !isNaN(parseInt(savedDeaths))) {
       this.registry.set('totalDeaths', parseInt(savedDeaths));
     } else if (!this.registry.has('totalDeaths')) {
       this.registry.set('totalDeaths', 0);
     }
-    
+
+    if (savedMaxHealth && !isNaN(parseInt(savedMaxHealth))) {
+      this.registry.set('maxHealth', parseInt(savedMaxHealth));
+    } else if (!this.registry.has('maxHealth')) {
+      this.registry.set('maxHealth', 3);
+    }
+
     // Start the game scene
     this.scene.start('GameScene');
     this.scene.launch('UIScene');

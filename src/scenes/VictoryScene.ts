@@ -60,10 +60,12 @@ export class VictoryScene extends Phaser.Scene {
     this.input.keyboard!.once('keydown-SPACE', () => {
       this.registry.set('currentLevel', 1);
       this.registry.set('totalDeaths', 0);
+      this.registry.set('maxHealth', 3);
 
       // Clear localStorage
       localStorage.setItem('leveldevil_currentLevel', '1');
       localStorage.setItem('leveldevil_totalDeaths', '0');
+      localStorage.setItem('leveldevil_maxHealth', '3');
 
       this.scene.start('GameScene');
     });
