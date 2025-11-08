@@ -3,8 +3,8 @@ import Phaser from 'phaser';
 export class UIScene extends Phaser.Scene {
   private deathCount: number = 0;
   private deathText!: Phaser.GameObjects.Text;
-  private hearts: Phaser.GameObjects.Image[] = [];
-
+  private hearts: Phaser.GameObjects.Sprite[] = [];
+  
   // Mobile controls
   private leftButton!: Phaser.GameObjects.Graphics;
   private rightButton!: Phaser.GameObjects.Graphics;
@@ -21,12 +21,23 @@ export class UIScene extends Phaser.Scene {
   }
 
   create(): void {
+    // Create heart animation
+    if (!this.anims.exists('heart-beat')) {
+      this.anims.create({
+        key: 'heart-beat',
+        frames: this.anims.generateFrameNumbers('heart', { start: 0, end: 16 }),
+        frameRate: 10,
+        repeat: -1,
+      });
+    }
+
     // Hearts display (top-left)
     for (let i = 0; i < 3; i++) {
-      const heart = this.add.image(20 + i * 35, 25, 'heart');
+      const heart = this.add.sprite(20 + i * 35, 25, 'heart');
       heart.setScrollFactor(0);
       heart.setDepth(1000);
       heart.setScale(2);
+      heart.play('heart-beat');
       this.hearts.push(heart);
     }
 

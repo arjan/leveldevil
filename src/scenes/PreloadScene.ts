@@ -52,7 +52,10 @@ export class PreloadScene extends Phaser.Scene {
     this.load.image('background', 'assets/Background/Purple.png');
 
     // Load UI
-    this.load.image('heart', 'assets/Items/Fruits/Strawberry.png'); // Using strawberry as heart
+    this.load.spritesheet('heart', 'assets/Items/Fruits/Strawberry.png', {
+      frameWidth: 32,
+      frameHeight: 32,
+    }); // Animated strawberry heart
 
     // Load player sprites
     this.load.spritesheet('player-idle', 'assets/sprites/player-idle.png', {
