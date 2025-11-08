@@ -15,6 +15,7 @@ export class MushroomBoss extends Phaser.Physics.Arcade.Sprite {
   private directionChangeCooldown: number = 500; // Wait 500ms before changing direction again
   private playerRef: Phaser.Physics.Arcade.Sprite | null = null;
   private bulletsGroup: Phaser.GameObjects.Group | null = null;
+  private isInvulnerable: boolean = false;
 
   constructor(
     scene: Phaser.Scene,
@@ -208,9 +209,13 @@ export class MushroomBoss extends Phaser.Physics.Arcade.Sprite {
   }
 
   takeDamage(): void {
-    if (!this.active) return;
+    if (!this.active || this.isInvulnerable) return;
 
     this.health--;
+    console.log(`Boss health: ${this.health}/10`);
+
+    // Make invulnerable temporarily
+    this.isInvulnerable = true;
 
     // Flash effect
     this.setTint(0xff0000);
@@ -218,6 +223,11 @@ export class MushroomBoss extends Phaser.Physics.Arcade.Sprite {
       if (this.active) {
         this.clearTint();
       }
+    });
+
+    // Remove invulnerability after 500ms
+    this.scene.time.delayedCall(500, () => {
+      this.isInvulnerable = false;
     });
 
     // Emit event for UI

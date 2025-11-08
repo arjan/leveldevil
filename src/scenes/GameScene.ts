@@ -292,6 +292,15 @@ export class GameScene extends Phaser.Scene {
       this.debugInvincible = !this.debugInvincible;
       this.game.events.emit('debugInvincibilityChanged', this.debugInvincible);
     });
+
+    // Listen for boss defeated event
+    this.events.on('bossDefeated', () => {
+      // Wait a moment then show victory
+      this.time.delayedCall(2000, () => {
+        this.scene.stop('UIScene');
+        this.scene.start('VictoryScene');
+      });
+    });
   }
 
   private spawnSlimes(): void {

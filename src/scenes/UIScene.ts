@@ -46,7 +46,8 @@ export class UIScene extends Phaser.Scene {
     }
 
     // Level display (top-center)
-    this.levelText = this.add.text(this.cameras.main.width / 2, 16, 'Level 1', {
+    const currentLevel = this.registry.get('currentLevel') || 1;
+    this.levelText = this.add.text(this.cameras.main.width / 2, 16, `Level ${currentLevel}`, {
       fontFamily: 'Arial',
       fontSize: '28px',
       color: '#FFD700',
