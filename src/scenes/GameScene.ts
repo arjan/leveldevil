@@ -8,6 +8,7 @@ export class GameScene extends Phaser.Scene {
   private spikesLayer!: Phaser.Tilemaps.TilemapLayer;
   private player!: Player;
   private spawnPoint!: { x: number; y: number };
+  private isDead: boolean = false;
 
   constructor() {
     super({ key: 'GameScene' });
@@ -61,10 +62,14 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.collider(this.player, this.hiddenLayer);
     
     // Spike collision with death callback
-    this.physics.add.collider(
+    this.physics.add.overlap(
       this.player,
       this.spikesLayer,
-      () => this.onDeath(),
+      () => {
+        if (!this.isDead) {
+          this.onDeath();
+        }
+      },
       undefined,
       this
     );
@@ -123,6 +128,9 @@ export class GameScene extends Phaser.Scene {
   }
 
   onDeath(): void {
+    // Prevent multiple death triggers
+    this.isDead = true;
+    
     // Emit death event for UI
     this.game.events.emit('playerDeath');
     
@@ -130,6 +138,7 @@ export class GameScene extends Phaser.Scene {
     this.time.delayedCall(500, () => {
       if (this.player) {
         this.player.respawn(this.spawnPoint.x, this.spawnPoint.y);
+        this.isDead = false;
       }
     });
   }
