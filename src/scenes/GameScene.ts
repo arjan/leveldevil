@@ -102,7 +102,7 @@ export class GameScene extends Phaser.Scene {
     // Camera setup
     this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
-    this.cameras.main.setDeadzone(200, 100);
+    // Center camera on player (no deadzone)
   }
 
   private setupTriggers(): void {

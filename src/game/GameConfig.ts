@@ -11,7 +11,7 @@ export const GameConfig: Phaser.Types.Core.GameConfig = {
   scale: {
     mode: Phaser.Scale.FIT,
     autoCenter: Phaser.Scale.CENTER_BOTH,
-    width: 480,  // Halved from 960 to make everything appear 2x bigger
+    width: 480, // Halved from 960 to make everything appear 2x bigger
     height: 270, // Halved from 540 to make everything appear 2x bigger
     parent: 'game',
   },
