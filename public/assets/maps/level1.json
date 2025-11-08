@@ -7243,6 +7243,17 @@
    "name": "Enemies",
    "objects": [
     {
+     "height": 32,
+     "id": 14,
+     "name": "Trunk",
+     "rotation": 0,
+     "type": "trunk",
+     "visible": true,
+     "width": 64,
+     "x": 200,
+     "y": 208
+    },
+    {
      "height": 30,
      "id": 11,
      "name": "Slime",
@@ -7307,7 +7318,7 @@
   }
  ],
  "nextlayerid": 8,
- "nextobjectid": 14,
+ "nextobjectid": 15,
  "orientation": "orthogonal",
  "renderorder": "right-down",
  "tiledversion": "1.11.0",

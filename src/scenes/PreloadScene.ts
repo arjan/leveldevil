@@ -88,6 +88,20 @@ export class PreloadScene extends Phaser.Scene {
       frameWidth: 44,
       frameHeight: 30,
     });
+
+    this.load.spritesheet('trunk-idle', 'assets/enemies/trunk/Idle.png', {
+      frameWidth: 64,
+      frameHeight: 32,
+    });
+    this.load.spritesheet('trunk-attack', 'assets/enemies/trunk/Attack.png', {
+      frameWidth: 64,
+      frameHeight: 32,
+    });
+    this.load.spritesheet('trunk-hit', 'assets/enemies/trunk/Hit.png', {
+      frameWidth: 64,
+      frameHeight: 32,
+    });
+    this.load.image('trunk-bullet', 'assets/enemies/trunk/Bullet.png');
   }
 
   create(): void {

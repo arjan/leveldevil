@@ -1,6 +1,7 @@
 import Phaser from 'phaser';
 import { Player } from '../objects/Player';
 import { Slime } from '../objects/Slime';
+import { Trunk, TrunkBullet } from '../objects/Trunk';
 
 export class GameScene extends Phaser.Scene {
   private map!: Phaser.Tilemaps.Tilemap;
@@ -16,6 +17,8 @@ export class GameScene extends Phaser.Scene {
   private debugInvincible: boolean = false;
   private levelCompleted: boolean = false;
   private slimes: Phaser.GameObjects.Group;
+  private trunks: Phaser.GameObjects.Group;
+  private bullets: Phaser.GameObjects.Group;
 
   constructor() {
     super({ key: 'GameScene' });
@@ -102,8 +105,22 @@ export class GameScene extends Phaser.Scene {
       runChildUpdate: true,
     });
 
-    // Spawn slimes from object layer
+    // Create trunks group
+    this.trunks = this.add.group({
+      classType: Trunk,
+      runChildUpdate: false, // We'll update manually
+    });
+
+    // Create bullets group
+    this.bullets = this.add.group({
+      classType: TrunkBullet,
+      maxSize: 20,
+      runChildUpdate: false,
+    });
+
+    // Spawn enemies from object layer
     this.spawnSlimes();
+    this.spawnTrunks();
 
     // Setup collisions
     this.physics.add.collider(this.player, this.groundLayer);
@@ -132,6 +149,53 @@ export class GameScene extends Phaser.Scene {
           if (!this.isDead) {
             this.takeDamage();
           }
+        }
+      },
+      undefined,
+      this
+    );
+
+    // Trunk collisions
+    this.physics.add.collider(this.trunks, this.groundLayer);
+    this.physics.add.collider(this.trunks, this.hiddenLayer);
+
+    // Player hits trunk from above
+    this.physics.add.overlap(
+      this.player,
+      this.trunks,
+      (player, trunk) => {
+        const playerBody = player.body as Phaser.Physics.Arcade.Body;
+        const trunkSprite = trunk as Trunk;
+
+        // If player is falling and hits from above
+        if (playerBody.velocity.y > 0 && player.y < trunk.y) {
+          // Bounce player
+          playerBody.setVelocityY(-300);
+          // Destroy trunk
+          trunkSprite.hit();
+        } else {
+          // Player gets hurt
+          if (!this.isDead) {
+            this.takeDamage();
+          }
+        }
+      },
+      undefined,
+      this
+    );
+
+    // Bullet collisions
+    this.physics.add.collider(this.bullets, this.groundLayer, (bullet) => {
+      bullet.destroy();
+    });
+
+    this.physics.add.overlap(
+      this.player,
+      this.bullets,
+      (player, bullet) => {
+        bullet.destroy();
+        if (!this.isDead) {
+          this.takeDamage();
         }
       },
       undefined,
@@ -186,6 +250,27 @@ export class GameScene extends Phaser.Scene {
           this.groundLayer
         );
         this.slimes.add(slime);
+      }
+    });
+  }
+
+  private spawnTrunks(): void {
+    const enemiesLayer = this.map.getObjectLayer('Enemies');
+    if (!enemiesLayer) return;
+
+    enemiesLayer.objects.forEach(enemyObj => {
+      if (enemyObj.type === 'trunk' || enemyObj.name === 'Trunk') {
+        // Direction from custom property or default to left (-1)
+        const direction = (enemyObj.properties as any)?.direction || -1;
+        
+        const trunk = new Trunk(
+          this,
+          enemyObj.x! + (enemyObj.width || 0) / 2,
+          enemyObj.y! + (enemyObj.height || 0) / 2,
+          direction
+        );
+        trunk.setPlayer(this.player);
+        this.trunks.add(trunk);
       }
     });
   }
@@ -307,6 +392,15 @@ export class GameScene extends Phaser.Scene {
     if (this.player && !this.isDead) {
       this.player.update(time, delta);
     }
+
+    // Update trunks manually
+    this.trunks.children.each((trunk) => {
+      const trunkSprite = trunk as Trunk;
+      if (trunkSprite.active) {
+        trunkSprite.update(time, delta, this.bullets);
+      }
+      return true;
+    });
   }
 
   takeDamage(): void {
