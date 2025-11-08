@@ -167,8 +167,17 @@
  "tileheight":16,
  "tilesets":[
         {
+         "columns":12,
          "firstgid":1,
-         "source":"tileset.json"
+         "image":"../tiles/terrain.png",
+         "imageheight":96,
+         "imagewidth":192,
+         "margin":0,
+         "name":"tileset",
+         "spacing":0,
+         "tilecount":72,
+         "tileheight":16,
+         "tilewidth":16
         }],
  "tilewidth":16,
  "type":"map",

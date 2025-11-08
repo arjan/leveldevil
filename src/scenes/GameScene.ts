@@ -29,7 +29,7 @@ export class GameScene extends Phaser.Scene {
 
     this.hiddenLayer = this.map.createLayer('Hidden', tileset)!;
     this.hiddenLayer.setVisible(false);
-    this.hiddenLayer.setCollisionByProperty({ collides: true });
+    // Don't enable collision yet - will be enabled when revealed
 
     this.spikesLayer = this.map.createLayer('Spikes', tileset)!;
     this.spikesLayer.setCollisionByProperty({ deadly: true });
