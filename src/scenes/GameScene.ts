@@ -12,6 +12,7 @@ export class GameScene extends Phaser.Scene {
   private health: number = 3;
   private isInvulnerable: boolean = false;
   private currentLevel: number = 1;
+  private debugInvincible: boolean = false;
 
   constructor() {
     super({ key: 'GameScene' });
@@ -120,6 +121,13 @@ export class GameScene extends Phaser.Scene {
     
     // Emit level change
     this.game.events.emit('levelChanged', this.currentLevel);
+    
+    // Setup debug controls
+    this.input.keyboard!.on('keydown-I', () => {
+      this.debugInvincible = !this.debugInvincible;
+      console.log(`Debug Invincibility: ${this.debugInvincible ? 'ON' : 'OFF'}`);
+      this.game.events.emit('debugInvincibilityChanged', this.debugInvincible);
+    });
   }
 
   private setupTriggers(): void {
@@ -221,7 +229,7 @@ export class GameScene extends Phaser.Scene {
   }
 
   takeDamage(): void {
-    if (this.isInvulnerable) return;
+    if (this.isInvulnerable || this.debugInvincible) return;
 
     this.health--;
     this.game.events.emit('healthChanged', this.health);
