@@ -26,7 +26,6 @@ export class GameScene extends Phaser.Scene {
 
     // Create layers
     this.groundLayer = this.map.createLayer('Ground', tileset)!;
-    // Set collision on all tiles in the Ground layer (tiles 1-72)
     const groundTiles = new Set<number>();
     this.groundLayer.forEachTile((tile) => {
       if (tile.index > 0) {
@@ -35,7 +34,6 @@ export class GameScene extends Phaser.Scene {
     });
     if (groundTiles.size > 0) {
       this.groundLayer.setCollision(Array.from(groundTiles));
-      console.log('Ground collision tiles:', Array.from(groundTiles));
     }
 
     this.hiddenLayer = this.map.createLayer('Hidden', tileset)!;
@@ -43,7 +41,6 @@ export class GameScene extends Phaser.Scene {
     // Don't enable collision yet - will be enabled when revealed
 
     this.spikesLayer = this.map.createLayer('Spikes', tileset)!;
-    // Set collision on spike tiles
     const spikeTiles = new Set<number>();
     this.spikesLayer.forEachTile((tile) => {
       if (tile.index > 0) {
@@ -52,7 +49,6 @@ export class GameScene extends Phaser.Scene {
     });
     if (spikeTiles.size > 0) {
       this.spikesLayer.setCollision(Array.from(spikeTiles));
-      console.log('Spike collision tiles:', Array.from(spikeTiles));
     }
     this.spikesLayer.setTint(0xff4444); // Red tint to make spikes visible
 
@@ -91,9 +87,7 @@ export class GameScene extends Phaser.Scene {
       this.player,
       this.spikesLayer,
       (player, tile) => {
-        // Only trigger death if touching an actual spike tile (non-zero index)
         const spikeTile = tile as Phaser.Tilemaps.Tile;
-        console.log('Overlap with spike tile:', spikeTile.index);
         if (!this.isDead && spikeTile.index > 0) {
           this.onDeath();
         }
