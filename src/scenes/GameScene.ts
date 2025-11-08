@@ -90,8 +90,11 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.overlap(
       this.player,
       this.spikesLayer,
-      () => {
-        if (!this.isDead) {
+      (player, tile) => {
+        // Only trigger death if touching an actual spike tile (non-zero index)
+        const spikeTile = tile as Phaser.Tilemaps.Tile;
+        console.log('Overlap with spike tile:', spikeTile.index);
+        if (!this.isDead && spikeTile.index > 0) {
           this.onDeath();
         }
       },
