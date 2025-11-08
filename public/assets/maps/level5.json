@@ -11319,6 +11319,106 @@
   },
   {
    "draworder": "topdown",
+   "id": 7,
+   "name": "Enemies",
+   "objects": [
+    {
+     "height": 30,
+     "id": 100,
+     "name": "Slime",
+     "rotation": 0,
+     "type": "slime",
+     "visible": true,
+     "width": 44,
+     "x": 391,
+     "y": 208
+    },
+    {
+     "height": 30,
+     "id": 101,
+     "name": "Slime",
+     "rotation": 0,
+     "type": "slime",
+     "visible": true,
+     "width": 44,
+     "x": 782,
+     "y": 208
+    },
+    {
+     "height": 30,
+     "id": 102,
+     "name": "Slime",
+     "rotation": 0,
+     "type": "slime",
+     "visible": true,
+     "width": 44,
+     "x": 1173,
+     "y": 208
+    },
+    {
+     "height": 30,
+     "id": 103,
+     "name": "Slime",
+     "rotation": 0,
+     "type": "slime",
+     "visible": true,
+     "width": 44,
+     "x": 1564,
+     "y": 208
+    },
+    {
+     "height": 30,
+     "id": 104,
+     "name": "Slime",
+     "rotation": 0,
+     "type": "slime",
+     "visible": true,
+     "width": 44,
+     "x": 1955,
+     "y": 208
+    },
+    {
+     "height": 30,
+     "id": 105,
+     "name": "Slime",
+     "rotation": 0,
+     "type": "slime",
+     "visible": true,
+     "width": 44,
+     "x": 2346,
+     "y": 208
+    },
+    {
+     "height": 30,
+     "id": 106,
+     "name": "Slime",
+     "rotation": 0,
+     "type": "slime",
+     "visible": true,
+     "width": 44,
+     "x": 2737,
+     "y": 208
+    },
+    {
+     "height": 30,
+     "id": 107,
+     "name": "Slime",
+     "rotation": 0,
+     "type": "slime",
+     "visible": true,
+     "width": 44,
+     "x": 3128,
+     "y": 208
+    }
+   ],
+   "opacity": 1,
+   "type": "objectgroup",
+   "visible": true,
+   "x": 0,
+   "y": 0
+  },
+  {
+   "draworder": "topdown",
    "id": 6,
    "name": "Goal",
    "objects": [
@@ -11341,8 +11441,8 @@
    "y": 0
   }
  ],
- "nextlayerid": 7,
- "nextobjectid": 11,
+ "nextlayerid": 8,
+ "nextobjectid": 108,
  "orientation": "orthogonal",
  "renderorder": "right-down",
  "tiledversion": "1.11.0",

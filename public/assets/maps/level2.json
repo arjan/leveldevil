@@ -8259,6 +8259,73 @@
   },
   {
    "draworder": "topdown",
+   "id": 7,
+   "name": "Enemies",
+   "objects": [
+    {
+     "height": 30,
+     "id": 100,
+     "name": "Slime",
+     "rotation": 0,
+     "type": "slime",
+     "visible": true,
+     "width": 44,
+     "x": 426,
+     "y": 208
+    },
+    {
+     "height": 30,
+     "id": 101,
+     "name": "Slime",
+     "rotation": 0,
+     "type": "slime",
+     "visible": true,
+     "width": 44,
+     "x": 852,
+     "y": 208
+    },
+    {
+     "height": 30,
+     "id": 102,
+     "name": "Slime",
+     "rotation": 0,
+     "type": "slime",
+     "visible": true,
+     "width": 44,
+     "x": 1278,
+     "y": 208
+    },
+    {
+     "height": 30,
+     "id": 103,
+     "name": "Slime",
+     "rotation": 0,
+     "type": "slime",
+     "visible": true,
+     "width": 44,
+     "x": 1704,
+     "y": 208
+    },
+    {
+     "height": 30,
+     "id": 104,
+     "name": "Slime",
+     "rotation": 0,
+     "type": "slime",
+     "visible": true,
+     "width": 44,
+     "x": 2130,
+     "y": 208
+    }
+   ],
+   "opacity": 1,
+   "type": "objectgroup",
+   "visible": true,
+   "x": 0,
+   "y": 0
+  },
+  {
+   "draworder": "topdown",
    "id": 6,
    "name": "Goal",
    "objects": [
@@ -8281,8 +8348,8 @@
    "y": 0
   }
  ],
- "nextlayerid": 7,
- "nextobjectid": 11,
+ "nextlayerid": 8,
+ "nextobjectid": 105,
  "orientation": "orthogonal",
  "renderorder": "right-down",
  "tiledversion": "1.11.0",
