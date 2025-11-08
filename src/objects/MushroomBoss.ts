@@ -121,17 +121,17 @@ export class MushroomBoss extends Phaser.Physics.Arcade.Sprite {
       this.direction = 1;
     }
 
-    // Check for edges (raycast down in front)
-    const checkDistance = 50;
+    // Check for edges (raycast down in front) - boss is 4x larger, needs more distance
+    const checkDistance = 80; // Much further ahead for large boss
     const checkX = this.direction === 1 ? this.x + checkDistance : this.x - checkDistance;
-    const checkY = this.y + 30;
+    const checkY = this.y + 60; // Check well below the large boss
 
     const tile = this.groundLayer.getTileAtWorldXY(checkX, checkY);
 
-    // If no tile ahead (edge detected), turn around
+    // If no tile ahead (edge detected), turn around immediately
     if (!tile || tile.index <= 0) {
       this.direction *= -1;
-      // Stop current velocity to prevent falling off
+      // Stop current velocity immediately to prevent falling off
       body.setVelocityX(0);
     }
 
