@@ -3,7 +3,8 @@ import Phaser from 'phaser';
 export class UIScene extends Phaser.Scene {
   private deathCount: number = 0;
   private deathText!: Phaser.GameObjects.Text;
-
+  private hearts: Phaser.GameObjects.Image[] = [];
+  
   // Mobile controls
   private leftButton!: Phaser.GameObjects.Graphics;
   private rightButton!: Phaser.GameObjects.Graphics;
@@ -20,14 +21,24 @@ export class UIScene extends Phaser.Scene {
   }
 
   create(): void {
+    // Hearts display (top-left)
+    for (let i = 0; i < 3; i++) {
+      const heart = this.add.image(20 + i * 35, 25, 'heart');
+      heart.setScrollFactor(0);
+      heart.setDepth(1000);
+      heart.setScale(2);
+      this.hearts.push(heart);
+    }
+
     // Death counter (top-right)
-    this.deathText = this.add.text(16, 16, 'Deaths: 0', {
+    this.deathText = this.add.text(this.cameras.main.width - 16, 16, 'Deaths: 0', {
       fontFamily: 'Arial',
       fontSize: '24px',
       color: '#ffffff',
       backgroundColor: '#00000088',
       padding: { x: 10, y: 5 },
     });
+    this.deathText.setOrigin(1, 0);
     this.deathText.setScrollFactor(0);
     this.deathText.setDepth(1000);
 
@@ -41,6 +52,7 @@ export class UIScene extends Phaser.Scene {
 
     // Listen for death events from GameScene
     this.game.events.on('playerDeath', this.onPlayerDeath, this);
+    this.game.events.on('healthChanged', this.onHealthChanged, this);
   }
 
   private setupMobileControls(): void {
@@ -172,7 +184,15 @@ export class UIScene extends Phaser.Scene {
     this.deathText.setText(`Deaths: ${this.deathCount}`);
   }
 
+  onHealthChanged(health: number): void {
+    // Update heart display
+    for (let i = 0; i < this.hearts.length; i++) {
+      this.hearts[i].setVisible(i < health);
+    }
+  }
+
   shutdown(): void {
     this.game.events.off('playerDeath', this.onPlayerDeath, this);
+    this.game.events.off('healthChanged', this.onHealthChanged, this);
   }
 }

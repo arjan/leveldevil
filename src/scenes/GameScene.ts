@@ -9,12 +9,19 @@ export class GameScene extends Phaser.Scene {
   private player!: Player;
   private spawnPoint!: { x: number; y: number };
   private isDead: boolean = false;
+  private health: number = 3;
+  private isInvulnerable: boolean = false;
 
   constructor() {
     super({ key: 'GameScene' });
   }
 
   create(): void {
+    // Add background
+    this.add.tileSprite(0, 0, this.cameras.main.width * 10, this.cameras.main.height * 10, 'background')
+      .setOrigin(0, 0)
+      .setScrollFactor(0.5); // Parallax effect
+
     // Create tilemap
     this.map = this.make.tilemap({ key: 'level1' });
     const tileset = this.map.addTilesetImage('tileset', 'terrain-tileset');
@@ -50,7 +57,7 @@ export class GameScene extends Phaser.Scene {
     if (spikeTiles.size > 0) {
       this.spikesLayer.setCollision(Array.from(spikeTiles));
     }
-    this.spikesLayer.setTint(0xff4444); // Red tint to make spikes visible
+    // Don't tint - let the spike tiles show naturally
 
     // Set world bounds to match map size
     this.physics.world.bounds.width = this.map.widthInPixels;
@@ -88,8 +95,8 @@ export class GameScene extends Phaser.Scene {
       this.spikesLayer,
       (player, tile) => {
         const spikeTile = tile as Phaser.Tilemaps.Tile;
-        if (!this.isDead && spikeTile.index > 0) {
-          this.onDeath();
+        if (!this.isInvulnerable && spikeTile.index > 0) {
+          this.takeDamage();
         }
       },
       undefined,
@@ -148,8 +155,35 @@ export class GameScene extends Phaser.Scene {
 
   update(time: number, delta: number): void {
     // Update player
-    if (this.player) {
+    if (this.player && !this.isDead) {
       this.player.update(time, delta);
+    }
+  }
+
+  takeDamage(): void {
+    if (this.isInvulnerable) return;
+
+    this.health--;
+    this.game.events.emit('healthChanged', this.health);
+
+    if (this.health <= 0) {
+      this.onDeath();
+    } else {
+      // Make invulnerable temporarily
+      this.isInvulnerable = true;
+      
+      // Flash player
+      this.tweens.add({
+        targets: this.player,
+        alpha: 0.3,
+        duration: 100,
+        yoyo: true,
+        repeat: 5,
+        onComplete: () => {
+          this.player.setAlpha(1);
+          this.isInvulnerable = false;
+        }
+      });
     }
   }
 
@@ -161,10 +195,14 @@ export class GameScene extends Phaser.Scene {
     this.game.events.emit('playerDeath');
     
     // Respawn player
-    this.time.delayedCall(500, () => {
+    this.time.delayedCall(1000, () => {
       if (this.player) {
+        this.health = 3;
+        this.game.events.emit('healthChanged', this.health);
         this.player.respawn(this.spawnPoint.x, this.spawnPoint.y);
         this.isDead = false;
+        this.isInvulnerable = false;
+        this.player.setAlpha(1);
       }
     });
   }
