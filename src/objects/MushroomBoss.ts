@@ -16,6 +16,9 @@ export class MushroomBoss extends Phaser.Physics.Arcade.Sprite {
   private playerRef: Phaser.Physics.Arcade.Sprite | null = null;
   private bulletsGroup: Phaser.GameObjects.Group | null = null;
   private isInvulnerable: boolean = false;
+  private randomDirectionTimer: number = 0;
+  private randomDirectionCooldown: number = 2000; // Random direction change every 2-4 seconds
+  private currentSpeedMultiplier: number = 1;
 
   constructor(
     scene: Phaser.Scene,
@@ -103,6 +106,7 @@ export class MushroomBoss extends Phaser.Physics.Arcade.Sprite {
     this.attackTimer += delta;
     this.jumpTimer += delta;
     this.lastDirectionChangeTime += delta;
+    this.randomDirectionTimer += delta;
 
     // Check for edges BEFORE moving (raycast down in front) - boss is 4x larger, needs more distance
     const checkDistance = 80; // Much further ahead for large boss
@@ -128,8 +132,22 @@ export class MushroomBoss extends Phaser.Physics.Arcade.Sprite {
       }
     }
 
-    // Patrol movement (faster when attacking)
-    const currentSpeed = this.isAttacking ? this.speed * 2 : this.speed;
+    // Random direction changes to make movement less predictable
+    if (this.randomDirectionTimer >= this.randomDirectionCooldown) {
+      // 50% chance to change direction
+      if (Math.random() < 0.5) {
+        this.direction *= -1;
+      }
+      // Random speed variation (0.7x to 1.3x)
+      this.currentSpeedMultiplier = 0.7 + Math.random() * 0.6;
+      // Reset with random cooldown between 2-4 seconds
+      this.randomDirectionCooldown = 2000 + Math.random() * 2000;
+      this.randomDirectionTimer = 0;
+    }
+
+    // Patrol movement with random speed variations
+    const baseSpeed = this.isAttacking ? this.speed * 2 : this.speed;
+    const currentSpeed = baseSpeed * this.currentSpeedMultiplier;
     body.setVelocityX(currentSpeed * this.direction);
 
     // Flip sprite based on direction
@@ -146,17 +164,21 @@ export class MushroomBoss extends Phaser.Physics.Arcade.Sprite {
       }
     }
 
-    // Special attack: Shoot bullets every 2 seconds
+    // Special attack: Shoot bullets with random timing
     if (this.attackTimer >= this.attackCooldown) {
       this.shootBullet();
       this.attackTimer = 0;
+      // Randomize next attack cooldown (1.5 to 3 seconds)
+      this.attackCooldown = 1500 + Math.random() * 1500;
     }
 
-    // Special ability: Jump every 5 seconds
+    // Special ability: Jump with random timing
     if (this.jumpTimer >= this.jumpCooldown && this.canJump && body.blocked.down) {
       body.setVelocityY(-400); // Jump
       this.jumpTimer = 0;
       this.canJump = false;
+      // Randomize next jump cooldown (3 to 6 seconds)
+      this.jumpCooldown = 3000 + Math.random() * 3000;
 
       // Can jump again after landing
       this.scene.time.delayedCall(1000, () => {
