@@ -111,7 +111,7 @@ export class Trunk extends Phaser.Physics.Arcade.Sprite {
     this.playerRef = player;
   }
 
-  update(time: number, delta: number, bullets: Phaser.GameObjects.Group): void {
+  update(_time: number, delta: number, bullets: Phaser.GameObjects.Group): void {
     if (!this.playerRef || !this.active) return;
 
     const body = this.body as Phaser.Physics.Arcade.Body;

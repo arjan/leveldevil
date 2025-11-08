@@ -90,7 +90,7 @@ export class MushroomBoss extends Phaser.Physics.Arcade.Sprite {
     }
   }
 
-  update(time: number, delta: number): void {
+  update(_time: number, delta: number): void {
     if (!this.active) return;
 
     const body = this.body as Phaser.Physics.Arcade.Body;

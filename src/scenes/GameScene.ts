@@ -18,10 +18,10 @@ export class GameScene extends Phaser.Scene {
   private currentLevel: number = 1;
   private debugInvincible: boolean = false;
   private levelCompleted: boolean = false;
-  private slimes: Phaser.GameObjects.Group;
-  private trunks: Phaser.GameObjects.Group;
-  private bullets: Phaser.GameObjects.Group;
-  private spikes: Phaser.GameObjects.Group;
+  private slimes!: Phaser.GameObjects.Group;
+  private trunks!: Phaser.GameObjects.Group;
+  private bullets!: Phaser.GameObjects.Group;
+  private spikes!: Phaser.GameObjects.Group;
   private boss: MushroomBoss | null = null;
 
   constructor() {
@@ -164,9 +164,11 @@ export class GameScene extends Phaser.Scene {
       (player, slime) => {
         const playerBody = player.body as Phaser.Physics.Arcade.Body;
         const slimeSprite = slime as Slime;
+        const playerSprite = player as Phaser.GameObjects.GameObject & { y: number };
+        const slimeObject = slime as Phaser.GameObjects.GameObject & { y: number };
 
         // If player is falling and hits from above
-        if (playerBody.velocity.y > 0 && player.y < slime.y) {
+        if (playerBody.velocity.y > 0 && playerSprite.y < slimeObject.y) {
           // Bounce player
           playerBody.setVelocityY(-300);
           // Destroy slime
@@ -193,9 +195,11 @@ export class GameScene extends Phaser.Scene {
       (player, trunk) => {
         const playerBody = player.body as Phaser.Physics.Arcade.Body;
         const trunkSprite = trunk as Trunk;
+        const playerSprite = player as Phaser.GameObjects.GameObject & { y: number };
+        const trunkObject = trunk as Phaser.GameObjects.GameObject & { y: number };
 
         // If player is falling and hits from above
-        if (playerBody.velocity.y > 0 && player.y < trunk.y) {
+        if (playerBody.velocity.y > 0 && playerSprite.y < trunkObject.y) {
           // Bounce player
           playerBody.setVelocityY(-300);
           // Destroy trunk
@@ -241,9 +245,11 @@ export class GameScene extends Phaser.Scene {
         (player, boss) => {
           const playerBody = player.body as Phaser.Physics.Arcade.Body;
           const bossSprite = boss as MushroomBoss;
+          const playerSprite = player as Phaser.GameObjects.GameObject & { y: number };
+          const bossObject = boss as Phaser.GameObjects.GameObject & { y: number };
 
           // If player is falling and hits from above
-          if (playerBody.velocity.y > 0 && player.y < boss.y - 20) {
+          if (playerBody.velocity.y > 0 && playerSprite.y < bossObject.y - 20) {
             // Bounce player higher for boss
             playerBody.setVelocityY(-400);
             // Damage boss
@@ -264,7 +270,7 @@ export class GameScene extends Phaser.Scene {
     this.physics.add.overlap(
       this.player,
       this.spikes,
-      (player, spike) => {
+      () => {
         if (!this.isInvulnerable && !this.isDead) {
           this.takeDamage();
         }
