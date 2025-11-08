@@ -107,8 +107,10 @@ export class MobileOrientationScene extends Phaser.Scene {
     this.playButton.setDepth(9998);
     this.playButton.setScrollFactor(0);
 
-    // Semi-transparent overlay
-    const overlay = this.add.rectangle(0, 0, width, height, 0x000000, 0.7);
+    // Semi-transparent overlay - make it interactive and cover full screen
+    const overlay = this.add.rectangle(0, 0, width * 2, height * 2, 0x000000, 0.7);
+    overlay.setOrigin(0.5);
+    overlay.setInteractive();
 
     // Large button background
     const buttonBg = this.add.graphics();
@@ -133,12 +135,7 @@ export class MobileOrientationScene extends Phaser.Scene {
 
     this.playButton.add([overlay, buttonBg, playIcon, text]);
 
-    // Make interactive
-    overlay.setInteractive(
-      new Phaser.Geom.Rectangle(-width / 2, -height / 2, width, height),
-      Phaser.Geom.Rectangle.Contains
-    );
-
+    // Make the overlay clickable
     overlay.on('pointerdown', () => {
       this.enterFullscreenAndPlay();
     });

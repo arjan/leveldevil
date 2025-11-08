@@ -22,6 +22,11 @@ export class UIScene extends Phaser.Scene {
   private rightButtonPointer: number = -1;
   private jumpButtonPointer: number = -1;
 
+  // Store button positions for sliding detection
+  private leftButtonBounds!: Phaser.Geom.Rectangle;
+  private rightButtonBounds!: Phaser.Geom.Rectangle;
+  private jumpButtonBounds!: Phaser.Geom.Rectangle;
+
   constructor() {
     super({ key: 'UIScene' });
   }
@@ -100,6 +105,8 @@ export class UIScene extends Phaser.Scene {
     // Left button (bottom-left corner)
     const leftX = margin;
     const leftY = height - buttonSize - margin;
+    this.leftButtonBounds = new Phaser.Geom.Rectangle(leftX, leftY, buttonSize, buttonSize);
+    
     this.leftButton = this.add.graphics();
     this.leftButton.fillStyle(0x444444, buttonAlpha);
     this.leftButton.fillRoundedRect(leftX, leftY, buttonSize, buttonSize, 8);
@@ -114,14 +121,13 @@ export class UIScene extends Phaser.Scene {
     );
     this.leftButton.setScrollFactor(0);
     this.leftButton.setDepth(1000);
-    this.leftButton.setInteractive(
-      new Phaser.Geom.Rectangle(leftX, leftY, buttonSize, buttonSize),
-      Phaser.Geom.Rectangle.Contains
-    );
+    this.leftButton.setInteractive(this.leftButtonBounds, Phaser.Geom.Rectangle.Contains);
 
     // Right button (next to left button)
     const rightX = leftX + buttonSize + margin;
     const rightY = height - buttonSize - margin;
+    this.rightButtonBounds = new Phaser.Geom.Rectangle(rightX, rightY, buttonSize, buttonSize);
+    
     this.rightButton = this.add.graphics();
     this.rightButton.fillStyle(0x444444, buttonAlpha);
     this.rightButton.fillRoundedRect(rightX, rightY, buttonSize, buttonSize, 8);
@@ -136,14 +142,13 @@ export class UIScene extends Phaser.Scene {
     );
     this.rightButton.setScrollFactor(0);
     this.rightButton.setDepth(1000);
-    this.rightButton.setInteractive(
-      new Phaser.Geom.Rectangle(rightX, rightY, buttonSize, buttonSize),
-      Phaser.Geom.Rectangle.Contains
-    );
+    this.rightButton.setInteractive(this.rightButtonBounds, Phaser.Geom.Rectangle.Contains);
 
     // Jump button (bottom-right corner)
     const jumpX = width - buttonSize - margin;
     const jumpY = height - buttonSize - margin;
+    this.jumpButtonBounds = new Phaser.Geom.Rectangle(jumpX, jumpY, buttonSize, buttonSize);
+    
     this.jumpButton = this.add.graphics();
     this.jumpButton.fillStyle(0x444444, buttonAlpha);
     this.jumpButton.fillRoundedRect(jumpX, jumpY, buttonSize, buttonSize, 8);
@@ -151,113 +156,131 @@ export class UIScene extends Phaser.Scene {
     this.jumpButton.fillCircle(jumpX + buttonSize / 2, jumpY + buttonSize / 2, 12);
     this.jumpButton.setScrollFactor(0);
     this.jumpButton.setDepth(1000);
-    this.jumpButton.setInteractive(
-      new Phaser.Geom.Rectangle(jumpX, jumpY, buttonSize, buttonSize),
-      Phaser.Geom.Rectangle.Contains
-    );
+    this.jumpButton.setInteractive(this.jumpButtonBounds, Phaser.Geom.Rectangle.Contains);
 
-    // Setup touch events with multi-touch support
-    // LEFT BUTTON
+    // Setup touch events with sliding support for left/right buttons
+    // Use global pointer tracking to detect sliding between buttons
+    const directionPointer = { id: -1 };
+
+    // Helper function to update button visuals and state based on pointer position
+    const updateDirectionButtons = (pointer: Phaser.Input.Pointer) => {
+      const inLeft = this.leftButtonBounds.contains(pointer.x, pointer.y);
+      const inRight = this.rightButtonBounds.contains(pointer.x, pointer.y);
+
+      // Update left button state
+      if (inLeft) {
+        if (!this.virtualLeft) {
+          this.virtualLeft = true;
+          this.leftButton.clear();
+          this.leftButton.fillStyle(0x666666, buttonAlpha + 0.2);
+          this.leftButton.fillRoundedRect(leftX, leftY, buttonSize, buttonSize, 8);
+          this.leftButton.fillStyle(0xffffff, 0.9);
+          this.leftButton.fillTriangle(
+            leftX + 12,
+            leftY + buttonSize / 2,
+            leftX + buttonSize - 15,
+            leftY + buttonSize / 2 - 10,
+            leftX + buttonSize - 15,
+            leftY + buttonSize / 2 + 10
+          );
+        }
+      } else {
+        if (this.virtualLeft) {
+          this.virtualLeft = false;
+          this.leftButton.clear();
+          this.leftButton.fillStyle(0x444444, buttonAlpha);
+          this.leftButton.fillRoundedRect(leftX, leftY, buttonSize, buttonSize, 8);
+          this.leftButton.fillStyle(0xffffff, 0.7);
+          this.leftButton.fillTriangle(
+            leftX + 12,
+            leftY + buttonSize / 2,
+            leftX + buttonSize - 15,
+            leftY + buttonSize / 2 - 10,
+            leftX + buttonSize - 15,
+            leftY + buttonSize / 2 + 10
+          );
+        }
+      }
+
+      // Update right button state
+      if (inRight) {
+        if (!this.virtualRight) {
+          this.virtualRight = true;
+          this.rightButton.clear();
+          this.rightButton.fillStyle(0x666666, buttonAlpha + 0.2);
+          this.rightButton.fillRoundedRect(rightX, rightY, buttonSize, buttonSize, 8);
+          this.rightButton.fillStyle(0xffffff, 0.9);
+          this.rightButton.fillTriangle(
+            rightX + buttonSize - 12,
+            rightY + buttonSize / 2,
+            rightX + 15,
+            rightY + buttonSize / 2 - 10,
+            rightX + 15,
+            rightY + buttonSize / 2 + 10
+          );
+        }
+      } else {
+        if (this.virtualRight) {
+          this.virtualRight = false;
+          this.rightButton.clear();
+          this.rightButton.fillStyle(0x444444, buttonAlpha);
+          this.rightButton.fillRoundedRect(rightX, rightY, buttonSize, buttonSize, 8);
+          this.rightButton.fillStyle(0xffffff, 0.7);
+          this.rightButton.fillTriangle(
+            rightX + buttonSize - 12,
+            rightY + buttonSize / 2,
+            rightX + 15,
+            rightY + buttonSize / 2 - 10,
+            rightX + 15,
+            rightY + buttonSize / 2 + 10
+          );
+        }
+      }
+    };
+
+    // LEFT/RIGHT BUTTON GROUP - Handle as one sliding area
     this.leftButton.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      if (this.leftButtonPointer === -1) {
-        this.leftButtonPointer = pointer.id;
-        this.virtualLeft = true;
-        this.leftButton.clear();
-        this.leftButton.fillStyle(0x666666, buttonAlpha + 0.2);
-        this.leftButton.fillRoundedRect(leftX, leftY, buttonSize, buttonSize, 8);
-        this.leftButton.fillStyle(0xffffff, 0.9);
-        this.leftButton.fillTriangle(
-          leftX + 12,
-          leftY + buttonSize / 2,
-          leftX + buttonSize - 15,
-          leftY + buttonSize / 2 - 10,
-          leftX + buttonSize - 15,
-          leftY + buttonSize / 2 + 10
-        );
+      if (directionPointer.id === -1) {
+        directionPointer.id = pointer.id;
+        updateDirectionButtons(pointer);
       }
     });
 
-    this.leftButton.on('pointerup', (pointer: Phaser.Input.Pointer) => {
-      if (pointer.id === this.leftButtonPointer) {
-        this.leftButtonPointer = -1;
-        this.virtualLeft = false;
-        this.leftButton.clear();
-        this.leftButton.fillStyle(0x444444, buttonAlpha);
-        this.leftButton.fillRoundedRect(leftX, leftY, buttonSize, buttonSize, 8);
-        this.leftButton.fillStyle(0xffffff, 0.7);
-        this.leftButton.fillTriangle(
-          leftX + 12,
-          leftY + buttonSize / 2,
-          leftX + buttonSize - 15,
-          leftY + buttonSize / 2 - 10,
-          leftX + buttonSize - 15,
-          leftY + buttonSize / 2 + 10
-        );
-      }
-    });
-
-    this.leftButton.on('pointerout', (pointer: Phaser.Input.Pointer) => {
-      if (pointer.id === this.leftButtonPointer) {
-        this.leftButtonPointer = -1;
-        this.virtualLeft = false;
-        this.leftButton.clear();
-        this.leftButton.fillStyle(0x444444, buttonAlpha);
-        this.leftButton.fillRoundedRect(leftX, leftY, buttonSize, buttonSize, 8);
-        this.leftButton.fillStyle(0xffffff, 0.7);
-        this.leftButton.fillTriangle(
-          leftX + 12,
-          leftY + buttonSize / 2,
-          leftX + buttonSize - 15,
-          leftY + buttonSize / 2 - 10,
-          leftX + buttonSize - 15,
-          leftY + buttonSize / 2 + 10
-        );
-      }
-    });
-
-    // RIGHT BUTTON
     this.rightButton.on('pointerdown', (pointer: Phaser.Input.Pointer) => {
-      if (this.rightButtonPointer === -1) {
-        this.rightButtonPointer = pointer.id;
-        this.virtualRight = true;
-        this.rightButton.clear();
-        this.rightButton.fillStyle(0x666666, buttonAlpha + 0.2);
-        this.rightButton.fillRoundedRect(rightX, rightY, buttonSize, buttonSize, 8);
-        this.rightButton.fillStyle(0xffffff, 0.9);
-        this.rightButton.fillTriangle(
-          rightX + buttonSize - 12,
-          rightY + buttonSize / 2,
-          rightX + 15,
-          rightY + buttonSize / 2 - 10,
-          rightX + 15,
-          rightY + buttonSize / 2 + 10
-        );
+      if (directionPointer.id === -1) {
+        directionPointer.id = pointer.id;
+        updateDirectionButtons(pointer);
       }
     });
 
-    this.rightButton.on('pointerup', (pointer: Phaser.Input.Pointer) => {
-      if (pointer.id === this.rightButtonPointer) {
-        this.rightButtonPointer = -1;
-        this.virtualRight = false;
-        this.rightButton.clear();
-        this.rightButton.fillStyle(0x444444, buttonAlpha);
-        this.rightButton.fillRoundedRect(rightX, rightY, buttonSize, buttonSize, 8);
-        this.rightButton.fillStyle(0xffffff, 0.7);
-        this.rightButton.fillTriangle(
-          rightX + buttonSize - 12,
-          rightY + buttonSize / 2,
-          rightX + 15,
-          rightY + buttonSize / 2 - 10,
-          rightX + 15,
-          rightY + buttonSize / 2 + 10
-        );
+    // Track pointer movement globally to detect sliding
+    this.input.on('pointermove', (pointer: Phaser.Input.Pointer) => {
+      if (pointer.id === directionPointer.id) {
+        updateDirectionButtons(pointer);
       }
     });
 
-    this.rightButton.on('pointerout', (pointer: Phaser.Input.Pointer) => {
-      if (pointer.id === this.rightButtonPointer) {
-        this.rightButtonPointer = -1;
+    // Release direction buttons when pointer is lifted
+    this.input.on('pointerup', (pointer: Phaser.Input.Pointer) => {
+      if (pointer.id === directionPointer.id) {
+        directionPointer.id = -1;
+        // Reset both buttons
+        this.virtualLeft = false;
         this.virtualRight = false;
+        
+        this.leftButton.clear();
+        this.leftButton.fillStyle(0x444444, buttonAlpha);
+        this.leftButton.fillRoundedRect(leftX, leftY, buttonSize, buttonSize, 8);
+        this.leftButton.fillStyle(0xffffff, 0.7);
+        this.leftButton.fillTriangle(
+          leftX + 12,
+          leftY + buttonSize / 2,
+          leftX + buttonSize - 15,
+          leftY + buttonSize / 2 - 10,
+          leftX + buttonSize - 15,
+          leftY + buttonSize / 2 + 10
+        );
+
         this.rightButton.clear();
         this.rightButton.fillStyle(0x444444, buttonAlpha);
         this.rightButton.fillRoundedRect(rightX, rightY, buttonSize, buttonSize, 8);
