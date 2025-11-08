@@ -69,10 +69,50 @@ export class GameScene extends Phaser.Scene {
       this
     );
 
+    // Setup trigger zones for revealing hidden walls
+    this.setupTriggers();
+
     // Camera setup
     this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
     this.cameras.main.setDeadzone(200, 100);
+  }
+
+  private setupTriggers(): void {
+    const triggersLayer = this.map.getObjectLayer('Triggers');
+    if (!triggersLayer) return;
+
+    triggersLayer.objects.forEach(triggerObj => {
+      if (triggerObj.type === 'reveal') {
+        // Create a zone for the trigger area
+        const zone = this.add.zone(
+          triggerObj.x! + triggerObj.width! / 2,
+          triggerObj.y! + triggerObj.height! / 2,
+          triggerObj.width!,
+          triggerObj.height!
+        );
+        
+        this.physics.add.existing(zone, false);
+
+        // Add overlap detection
+        this.physics.add.overlap(
+          this.player,
+          zone as Phaser.Types.Physics.Arcade.GameObjectWithBody,
+          () => {
+            // Reveal hidden layer
+            this.hiddenLayer.setVisible(true);
+            
+            // Enable collision on hidden layer
+            this.hiddenLayer.setCollisionByProperty({ collides: true });
+            
+            // Destroy the zone so it only triggers once
+            zone.destroy();
+          },
+          undefined,
+          this
+        );
+      }
+    });
   }
 
   update(time: number, delta: number): void {
