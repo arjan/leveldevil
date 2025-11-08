@@ -3,7 +3,7 @@ import Phaser from 'phaser';
 export class UIScene extends Phaser.Scene {
   private deathCount: number = 0;
   private deathText!: Phaser.GameObjects.Text;
-  
+
   // Mobile controls
   private leftButton!: Phaser.GameObjects.Graphics;
   private rightButton!: Phaser.GameObjects.Graphics;
@@ -54,11 +54,7 @@ export class UIScene extends Phaser.Scene {
     this.leftButton.fillStyle(0x444444, buttonAlpha);
     this.leftButton.fillRoundedRect(20, height - buttonSize - 20, buttonSize, buttonSize, 10);
     this.leftButton.fillStyle(0xffffff, 0.8);
-    this.leftButton.fillTriangle(
-      35, height - 50,
-      55, height - 40,
-      55, height - 60
-    );
+    this.leftButton.fillTriangle(35, height - 50, 55, height - 40, 55, height - 60);
     this.leftButton.setScrollFactor(0);
     this.leftButton.setDepth(1000);
     this.leftButton.setInteractive(
@@ -71,11 +67,7 @@ export class UIScene extends Phaser.Scene {
     this.rightButton.fillStyle(0x444444, buttonAlpha);
     this.rightButton.fillRoundedRect(100, height - buttonSize - 20, buttonSize, buttonSize, 10);
     this.rightButton.fillStyle(0xffffff, 0.8);
-    this.rightButton.fillTriangle(
-      145, height - 50,
-      125, height - 40,
-      125, height - 60
-    );
+    this.rightButton.fillTriangle(145, height - 50, 125, height - 40, 125, height - 60);
     this.rightButton.setScrollFactor(0);
     this.rightButton.setDepth(1000);
     this.rightButton.setInteractive(
