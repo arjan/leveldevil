@@ -11,6 +11,8 @@ export class MushroomBoss extends Phaser.Physics.Arcade.Sprite {
   private jumpTimer: number = 0;
   private jumpCooldown: number = 5000; // Jump every 5 seconds
   private canJump: boolean = true;
+  private lastDirectionChangeTime: number = 0;
+  private directionChangeCooldown: number = 500; // Wait 500ms before changing direction again
 
   constructor(
     scene: Phaser.Scene,
@@ -97,6 +99,7 @@ export class MushroomBoss extends Phaser.Physics.Arcade.Sprite {
     // Update timers
     this.attackTimer += delta;
     this.jumpTimer += delta;
+    this.lastDirectionChangeTime += delta;
 
     // Check for edges BEFORE moving (raycast down in front) - boss is 4x larger, needs more distance
     const checkDistance = 80; // Much further ahead for large boss
@@ -105,16 +108,21 @@ export class MushroomBoss extends Phaser.Physics.Arcade.Sprite {
 
     const tile = this.groundLayer.getTileAtWorldXY(checkX, checkY);
 
-    // If no tile ahead (edge detected), turn around
-    if (!tile || tile.index <= 0) {
+    // If no tile ahead (edge detected), turn around - with cooldown to prevent flickering
+    if ((!tile || tile.index <= 0) && this.lastDirectionChangeTime > this.directionChangeCooldown) {
       this.direction *= -1;
+      this.lastDirectionChangeTime = 0;
     }
 
-    // Check for walls
-    if (body.blocked.right && this.direction === 1) {
-      this.direction = -1;
-    } else if (body.blocked.left && this.direction === -1) {
-      this.direction = 1;
+    // Check for walls - with cooldown
+    if (this.lastDirectionChangeTime > this.directionChangeCooldown) {
+      if (body.blocked.right && this.direction === 1) {
+        this.direction = -1;
+        this.lastDirectionChangeTime = 0;
+      } else if (body.blocked.left && this.direction === -1) {
+        this.direction = 1;
+        this.lastDirectionChangeTime = 0;
+      }
     }
 
     // Patrol movement (faster when attacking)
