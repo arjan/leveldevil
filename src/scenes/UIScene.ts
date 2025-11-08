@@ -93,56 +93,66 @@ export class UIScene extends Phaser.Scene {
   private setupMobileControls(): void {
     const width = this.cameras.main.width;
     const height = this.cameras.main.height;
-    const buttonSize = 60;
-    const buttonAlpha = 0.4;
+    const buttonSize = 50;
+    const buttonAlpha = 0.3;
+    const margin = 10;
 
-    // Left button
+    // Left button (bottom-left corner)
+    const leftX = margin;
+    const leftY = height - buttonSize - margin;
     this.leftButton = this.add.graphics();
     this.leftButton.fillStyle(0x444444, buttonAlpha);
-    this.leftButton.fillRoundedRect(20, height - buttonSize - 20, buttonSize, buttonSize, 10);
-    this.leftButton.fillStyle(0xffffff, 0.8);
-    this.leftButton.fillTriangle(35, height - 50, 55, height - 40, 55, height - 60);
+    this.leftButton.fillRoundedRect(leftX, leftY, buttonSize, buttonSize, 8);
+    this.leftButton.fillStyle(0xffffff, 0.7);
+    this.leftButton.fillTriangle(
+      leftX + 12,
+      leftY + buttonSize / 2,
+      leftX + buttonSize - 15,
+      leftY + buttonSize / 2 - 10,
+      leftX + buttonSize - 15,
+      leftY + buttonSize / 2 + 10
+    );
     this.leftButton.setScrollFactor(0);
     this.leftButton.setDepth(1000);
     this.leftButton.setInteractive(
-      new Phaser.Geom.Rectangle(20, height - buttonSize - 20, buttonSize, buttonSize),
+      new Phaser.Geom.Rectangle(leftX, leftY, buttonSize, buttonSize),
       Phaser.Geom.Rectangle.Contains
     );
 
-    // Right button
+    // Right button (next to left button)
+    const rightX = leftX + buttonSize + margin;
+    const rightY = height - buttonSize - margin;
     this.rightButton = this.add.graphics();
     this.rightButton.fillStyle(0x444444, buttonAlpha);
-    this.rightButton.fillRoundedRect(100, height - buttonSize - 20, buttonSize, buttonSize, 10);
-    this.rightButton.fillStyle(0xffffff, 0.8);
-    this.rightButton.fillTriangle(145, height - 50, 125, height - 40, 125, height - 60);
+    this.rightButton.fillRoundedRect(rightX, rightY, buttonSize, buttonSize, 8);
+    this.rightButton.fillStyle(0xffffff, 0.7);
+    this.rightButton.fillTriangle(
+      rightX + buttonSize - 12,
+      rightY + buttonSize / 2,
+      rightX + 15,
+      rightY + buttonSize / 2 - 10,
+      rightX + 15,
+      rightY + buttonSize / 2 + 10
+    );
     this.rightButton.setScrollFactor(0);
     this.rightButton.setDepth(1000);
     this.rightButton.setInteractive(
-      new Phaser.Geom.Rectangle(100, height - buttonSize - 20, buttonSize, buttonSize),
+      new Phaser.Geom.Rectangle(rightX, rightY, buttonSize, buttonSize),
       Phaser.Geom.Rectangle.Contains
     );
 
-    // Jump button (right side)
+    // Jump button (bottom-right corner)
+    const jumpX = width - buttonSize - margin;
+    const jumpY = height - buttonSize - margin;
     this.jumpButton = this.add.graphics();
     this.jumpButton.fillStyle(0x444444, buttonAlpha);
-    this.jumpButton.fillRoundedRect(
-      width - buttonSize - 20,
-      height - buttonSize - 20,
-      buttonSize,
-      buttonSize,
-      10
-    );
-    this.jumpButton.fillStyle(0xffffff, 0.8);
-    this.jumpButton.fillCircle(width - buttonSize / 2 - 20, height - buttonSize / 2 - 20, 15);
+    this.jumpButton.fillRoundedRect(jumpX, jumpY, buttonSize, buttonSize, 8);
+    this.jumpButton.fillStyle(0xffffff, 0.7);
+    this.jumpButton.fillCircle(jumpX + buttonSize / 2, jumpY + buttonSize / 2, 12);
     this.jumpButton.setScrollFactor(0);
     this.jumpButton.setDepth(1000);
     this.jumpButton.setInteractive(
-      new Phaser.Geom.Rectangle(
-        width - buttonSize - 20,
-        height - buttonSize - 20,
-        buttonSize,
-        buttonSize
-      ),
+      new Phaser.Geom.Rectangle(jumpX, jumpY, buttonSize, buttonSize),
       Phaser.Geom.Rectangle.Contains
     );
 
@@ -154,9 +164,16 @@ export class UIScene extends Phaser.Scene {
         this.virtualLeft = true;
         this.leftButton.clear();
         this.leftButton.fillStyle(0x666666, buttonAlpha + 0.2);
-        this.leftButton.fillRoundedRect(20, height - buttonSize - 20, buttonSize, buttonSize, 10);
-        this.leftButton.fillStyle(0xffffff, 0.8);
-        this.leftButton.fillTriangle(35, height - 50, 55, height - 40, 55, height - 60);
+        this.leftButton.fillRoundedRect(leftX, leftY, buttonSize, buttonSize, 8);
+        this.leftButton.fillStyle(0xffffff, 0.9);
+        this.leftButton.fillTriangle(
+          leftX + 12,
+          leftY + buttonSize / 2,
+          leftX + buttonSize - 15,
+          leftY + buttonSize / 2 - 10,
+          leftX + buttonSize - 15,
+          leftY + buttonSize / 2 + 10
+        );
       }
     });
 
@@ -166,9 +183,16 @@ export class UIScene extends Phaser.Scene {
         this.virtualLeft = false;
         this.leftButton.clear();
         this.leftButton.fillStyle(0x444444, buttonAlpha);
-        this.leftButton.fillRoundedRect(20, height - buttonSize - 20, buttonSize, buttonSize, 10);
-        this.leftButton.fillStyle(0xffffff, 0.8);
-        this.leftButton.fillTriangle(35, height - 50, 55, height - 40, 55, height - 60);
+        this.leftButton.fillRoundedRect(leftX, leftY, buttonSize, buttonSize, 8);
+        this.leftButton.fillStyle(0xffffff, 0.7);
+        this.leftButton.fillTriangle(
+          leftX + 12,
+          leftY + buttonSize / 2,
+          leftX + buttonSize - 15,
+          leftY + buttonSize / 2 - 10,
+          leftX + buttonSize - 15,
+          leftY + buttonSize / 2 + 10
+        );
       }
     });
 
@@ -178,9 +202,16 @@ export class UIScene extends Phaser.Scene {
         this.virtualLeft = false;
         this.leftButton.clear();
         this.leftButton.fillStyle(0x444444, buttonAlpha);
-        this.leftButton.fillRoundedRect(20, height - buttonSize - 20, buttonSize, buttonSize, 10);
-        this.leftButton.fillStyle(0xffffff, 0.8);
-        this.leftButton.fillTriangle(35, height - 50, 55, height - 40, 55, height - 60);
+        this.leftButton.fillRoundedRect(leftX, leftY, buttonSize, buttonSize, 8);
+        this.leftButton.fillStyle(0xffffff, 0.7);
+        this.leftButton.fillTriangle(
+          leftX + 12,
+          leftY + buttonSize / 2,
+          leftX + buttonSize - 15,
+          leftY + buttonSize / 2 - 10,
+          leftX + buttonSize - 15,
+          leftY + buttonSize / 2 + 10
+        );
       }
     });
 
@@ -191,9 +222,16 @@ export class UIScene extends Phaser.Scene {
         this.virtualRight = true;
         this.rightButton.clear();
         this.rightButton.fillStyle(0x666666, buttonAlpha + 0.2);
-        this.rightButton.fillRoundedRect(100, height - buttonSize - 20, buttonSize, buttonSize, 10);
-        this.rightButton.fillStyle(0xffffff, 0.8);
-        this.rightButton.fillTriangle(145, height - 50, 125, height - 40, 125, height - 60);
+        this.rightButton.fillRoundedRect(rightX, rightY, buttonSize, buttonSize, 8);
+        this.rightButton.fillStyle(0xffffff, 0.9);
+        this.rightButton.fillTriangle(
+          rightX + buttonSize - 12,
+          rightY + buttonSize / 2,
+          rightX + 15,
+          rightY + buttonSize / 2 - 10,
+          rightX + 15,
+          rightY + buttonSize / 2 + 10
+        );
       }
     });
 
@@ -203,9 +241,16 @@ export class UIScene extends Phaser.Scene {
         this.virtualRight = false;
         this.rightButton.clear();
         this.rightButton.fillStyle(0x444444, buttonAlpha);
-        this.rightButton.fillRoundedRect(100, height - buttonSize - 20, buttonSize, buttonSize, 10);
-        this.rightButton.fillStyle(0xffffff, 0.8);
-        this.rightButton.fillTriangle(145, height - 50, 125, height - 40, 125, height - 60);
+        this.rightButton.fillRoundedRect(rightX, rightY, buttonSize, buttonSize, 8);
+        this.rightButton.fillStyle(0xffffff, 0.7);
+        this.rightButton.fillTriangle(
+          rightX + buttonSize - 12,
+          rightY + buttonSize / 2,
+          rightX + 15,
+          rightY + buttonSize / 2 - 10,
+          rightX + 15,
+          rightY + buttonSize / 2 + 10
+        );
       }
     });
 
@@ -215,9 +260,16 @@ export class UIScene extends Phaser.Scene {
         this.virtualRight = false;
         this.rightButton.clear();
         this.rightButton.fillStyle(0x444444, buttonAlpha);
-        this.rightButton.fillRoundedRect(100, height - buttonSize - 20, buttonSize, buttonSize, 10);
-        this.rightButton.fillStyle(0xffffff, 0.8);
-        this.rightButton.fillTriangle(145, height - 50, 125, height - 40, 125, height - 60);
+        this.rightButton.fillRoundedRect(rightX, rightY, buttonSize, buttonSize, 8);
+        this.rightButton.fillStyle(0xffffff, 0.7);
+        this.rightButton.fillTriangle(
+          rightX + buttonSize - 12,
+          rightY + buttonSize / 2,
+          rightX + 15,
+          rightY + buttonSize / 2 - 10,
+          rightX + 15,
+          rightY + buttonSize / 2 + 10
+        );
       }
     });
 
@@ -228,15 +280,9 @@ export class UIScene extends Phaser.Scene {
         this.virtualJump = true;
         this.jumpButton.clear();
         this.jumpButton.fillStyle(0x666666, buttonAlpha + 0.2);
-        this.jumpButton.fillRoundedRect(
-          width - buttonSize - 20,
-          height - buttonSize - 20,
-          buttonSize,
-          buttonSize,
-          10
-        );
-        this.jumpButton.fillStyle(0xffffff, 0.8);
-        this.jumpButton.fillCircle(width - buttonSize / 2 - 20, height - buttonSize / 2 - 20, 15);
+        this.jumpButton.fillRoundedRect(jumpX, jumpY, buttonSize, buttonSize, 8);
+        this.jumpButton.fillStyle(0xffffff, 0.9);
+        this.jumpButton.fillCircle(jumpX + buttonSize / 2, jumpY + buttonSize / 2, 12);
       }
     });
 
@@ -246,15 +292,9 @@ export class UIScene extends Phaser.Scene {
         this.virtualJump = false;
         this.jumpButton.clear();
         this.jumpButton.fillStyle(0x444444, buttonAlpha);
-        this.jumpButton.fillRoundedRect(
-          width - buttonSize - 20,
-          height - buttonSize - 20,
-          buttonSize,
-          buttonSize,
-          10
-        );
-        this.jumpButton.fillStyle(0xffffff, 0.8);
-        this.jumpButton.fillCircle(width - buttonSize / 2 - 20, height - buttonSize / 2 - 20, 15);
+        this.jumpButton.fillRoundedRect(jumpX, jumpY, buttonSize, buttonSize, 8);
+        this.jumpButton.fillStyle(0xffffff, 0.7);
+        this.jumpButton.fillCircle(jumpX + buttonSize / 2, jumpY + buttonSize / 2, 12);
       }
     });
 
@@ -264,15 +304,9 @@ export class UIScene extends Phaser.Scene {
         this.virtualJump = false;
         this.jumpButton.clear();
         this.jumpButton.fillStyle(0x444444, buttonAlpha);
-        this.jumpButton.fillRoundedRect(
-          width - buttonSize - 20,
-          height - buttonSize - 20,
-          buttonSize,
-          buttonSize,
-          10
-        );
-        this.jumpButton.fillStyle(0xffffff, 0.8);
-        this.jumpButton.fillCircle(width - buttonSize / 2 - 20, height - buttonSize / 2 - 20, 15);
+        this.jumpButton.fillRoundedRect(jumpX, jumpY, buttonSize, buttonSize, 8);
+        this.jumpButton.fillStyle(0xffffff, 0.7);
+        this.jumpButton.fillCircle(jumpX + buttonSize / 2, jumpY + buttonSize / 2, 12);
       }
     });
   }
