@@ -151,17 +151,30 @@ export class MushroomBoss extends Phaser.Physics.Arcade.Sprite {
       this.attackTimer = 0;
     }
 
+    // Special ability: Jump every 5 seconds
+    if (this.jumpTimer >= this.jumpCooldown && this.canJump && body.blocked.down) {
+      body.setVelocityY(-400); // Jump
+      this.jumpTimer = 0;
+      this.canJump = false;
+      
+      // Can jump again after landing
+      this.scene.time.delayedCall(1000, () => {
+        this.canJump = true;
+      });
+    }
+  }
+
   private shootBullet(): void {
     if (!this.bulletsGroup) return;
 
     // Aim generally at player with some randomness
     let shootDirection = this.direction; // Default to facing direction
-    
+
     if (this.playerRef && this.playerRef.active) {
       // Calculate angle to player
       const dx = this.playerRef.x - this.x;
       const randomOffset = (Math.random() - 0.5) * 60; // Random offset to make it less accurate
-      
+
       if (dx + randomOffset > 0) {
         shootDirection = 1;
       } else {
@@ -176,16 +189,16 @@ export class MushroomBoss extends Phaser.Physics.Arcade.Sprite {
       'spike' // Reuse spike sprite as bullet
     );
     bullet.setScale(0.8);
-    
+
     // Add physics
     this.scene.physics.add.existing(bullet);
     const bulletBody = bullet.body as Phaser.Physics.Arcade.Body;
     bulletBody.setAllowGravity(false);
     bulletBody.setVelocityX(200 * shootDirection);
-    
+
     // Add to group
     this.bulletsGroup.add(bullet);
-    
+
     // Auto-destroy after 5 seconds
     this.scene.time.delayedCall(5000, () => {
       if (bullet.active) {
@@ -232,4 +245,3 @@ export class MushroomBoss extends Phaser.Physics.Arcade.Sprite {
     return this.health;
   }
 }
-
