@@ -90,12 +90,7 @@ export class GameScene extends Phaser.Scene {
     this.spikesLayer.forEachTile(tile => {
       if (tile.index > 0) {
         // Create spike sprite at tile position
-        const spike = this.add.sprite(
-          tile.x * 16 + 8,
-          tile.y * 16 + 8,
-          'spike',
-          0
-        );
+        const spike = this.add.sprite(tile.x * 16 + 8, tile.y * 16 + 8, 'spike', 0);
         spike.setOrigin(0.5, 0.5);
         this.physics.add.existing(spike, true); // Static body
         this.spikes.add(spike);

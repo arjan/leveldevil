@@ -179,6 +179,8 @@ export class Trunk extends Phaser.Physics.Arcade.Sprite {
 
     // Create bullet after a small delay (animation timing)
     this.scene.time.delayedCall(300, () => {
+      if (!this.active) return; // Check if trunk still exists
+      
       const bullet = bullets.get() as TrunkBullet;
       if (bullet) {
         const offsetX = shootDirection === -1 ? -30 : 30;
@@ -187,7 +189,9 @@ export class Trunk extends Phaser.Physics.Arcade.Sprite {
 
       // Return to idle
       this.once('animationcomplete', () => {
-        this.play('trunk-idle');
+        if (this.active) { // Check if trunk still exists before playing animation
+          this.play('trunk-idle');
+        }
       });
     });
   }
