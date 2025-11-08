@@ -1,12 +1,10 @@
 import Phaser from 'phaser';
 
 export class UIScene extends Phaser.Scene {
-  private deathCount: number = 0;
-  private deathText!: Phaser.GameObjects.Text;
   private levelText!: Phaser.GameObjects.Text;
   private debugText!: Phaser.GameObjects.Text;
   private hearts: Phaser.GameObjects.Sprite[] = [];
-
+  
   // Mobile controls
   private leftButton!: Phaser.GameObjects.Graphics;
   private rightButton!: Phaser.GameObjects.Graphics;
@@ -45,18 +43,6 @@ export class UIScene extends Phaser.Scene {
       this.hearts.push(heart);
     }
 
-    // Death counter (top-right)
-    this.deathText = this.add.text(this.cameras.main.width - 16, 16, 'Deaths: 0', {
-      fontFamily: 'Arial',
-      fontSize: '24px',
-      color: '#ffffff',
-      backgroundColor: '#00000088',
-      padding: { x: 10, y: 5 },
-    });
-    this.deathText.setOrigin(1, 0);
-    this.deathText.setScrollFactor(0);
-    this.deathText.setDepth(1000);
-
     // Level display (top-center)
     this.levelText = this.add.text(this.cameras.main.width / 2, 16, 'Level 1', {
       fontFamily: 'Arial',
@@ -90,8 +76,7 @@ export class UIScene extends Phaser.Scene {
       this.setupMobileControls();
     }
 
-    // Listen for death events from GameScene
-    this.game.events.on('playerDeath', this.onPlayerDeath, this);
+    // Listen for events from GameScene
     this.game.events.on('healthChanged', this.onHealthChanged, this);
     this.game.events.on('levelChanged', this.onLevelChanged, this);
     this.game.events.on('debugInvincibilityChanged', this.onDebugInvincibilityChanged, this);
@@ -221,11 +206,6 @@ export class UIScene extends Phaser.Scene {
     });
   }
 
-  onPlayerDeath(): void {
-    this.deathCount++;
-    this.deathText.setText(`Deaths: ${this.deathCount}`);
-  }
-
   onHealthChanged(health: number): void {
     // Update heart display
     for (let i = 0; i < this.hearts.length; i++) {
@@ -254,7 +234,6 @@ export class UIScene extends Phaser.Scene {
   }
 
   shutdown(): void {
-    this.game.events.off('playerDeath', this.onPlayerDeath, this);
     this.game.events.off('healthChanged', this.onHealthChanged, this);
     this.game.events.off('levelChanged', this.onLevelChanged, this);
     this.game.events.off('debugInvincibilityChanged', this.onDebugInvincibilityChanged, this);

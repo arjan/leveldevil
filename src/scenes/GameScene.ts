@@ -290,9 +290,6 @@ export class GameScene extends Phaser.Scene {
     // Save to localStorage
     localStorage.setItem('leveldevil_totalDeaths', (totalDeaths + 1).toString());
 
-    // Emit death event for UI
-    this.game.events.emit('playerDeath');
-
     // Respawn player
     this.time.delayedCall(1000, () => {
       if (this.player) {
