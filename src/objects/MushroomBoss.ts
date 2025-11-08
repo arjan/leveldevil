@@ -156,7 +156,7 @@ export class MushroomBoss extends Phaser.Physics.Arcade.Sprite {
       body.setVelocityY(-400); // Jump
       this.jumpTimer = 0;
       this.canJump = false;
-      
+
       // Can jump again after landing
       this.scene.time.delayedCall(1000, () => {
         this.canJump = true;
@@ -243,5 +243,13 @@ export class MushroomBoss extends Phaser.Physics.Arcade.Sprite {
 
   getHealth(): number {
     return this.health;
+  }
+
+  public setPlayer(player: Phaser.Physics.Arcade.Sprite): void {
+    this.playerRef = player;
+  }
+
+  public setBulletsGroup(group: Phaser.GameObjects.Group): void {
+    this.bulletsGroup = group;
   }
 }
