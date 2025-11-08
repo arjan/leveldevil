@@ -19,7 +19,7 @@ export const GameConfig: Phaser.Types.Core.GameConfig = {
     default: 'arcade',
     arcade: {
       gravity: { y: 1600, x: 0 },
-      debug: false,
+      debug: true, // Enable to see collision boxes
     },
   },
   scene: [BootScene, PreloadScene, GameScene, UIScene],

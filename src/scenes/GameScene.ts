@@ -34,6 +34,7 @@ export class GameScene extends Phaser.Scene {
 
     this.spikesLayer = this.map.createLayer('Spikes', tileset)!;
     this.spikesLayer.setCollisionBetween(1, 72); // All spike tiles collide
+    this.spikesLayer.setTint(0xff4444); // Red tint to make spikes visible
 
     // Set world bounds to match map size
     this.physics.world.bounds.width = this.map.widthInPixels;
