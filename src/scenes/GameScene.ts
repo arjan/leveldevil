@@ -1,5 +1,6 @@
 import Phaser from 'phaser';
 import { Player } from '../objects/Player';
+import { Slime } from '../objects/Slime';
 
 export class GameScene extends Phaser.Scene {
   private map!: Phaser.Tilemaps.Tilemap;
@@ -14,6 +15,7 @@ export class GameScene extends Phaser.Scene {
   private currentLevel: number = 1;
   private debugInvincible: boolean = false;
   private levelCompleted: boolean = false;
+  private slimes: Phaser.GameObjects.Group;
 
   constructor() {
     super({ key: 'GameScene' });
@@ -94,9 +96,47 @@ export class GameScene extends Phaser.Scene {
       y: this.spawnPoint.y,
     });
 
+    // Create slimes group
+    this.slimes = this.add.group({
+      classType: Slime,
+      runChildUpdate: true,
+    });
+
+    // Spawn slimes from object layer
+    this.spawnSlimes();
+
     // Setup collisions
     this.physics.add.collider(this.player, this.groundLayer);
     this.physics.add.collider(this.player, this.hiddenLayer);
+
+    // Slime collisions
+    this.physics.add.collider(this.slimes, this.groundLayer);
+    this.physics.add.collider(this.slimes, this.hiddenLayer);
+
+    // Player hits slime from above
+    this.physics.add.overlap(
+      this.player,
+      this.slimes,
+      (player, slime) => {
+        const playerBody = player.body as Phaser.Physics.Arcade.Body;
+        const slimeSprite = slime as Slime;
+
+        // If player is falling and hits from above
+        if (playerBody.velocity.y > 0 && player.y < slime.y) {
+          // Bounce player
+          playerBody.setVelocityY(-300);
+          // Destroy slime
+          slimeSprite.hit();
+        } else {
+          // Player gets hurt
+          if (!this.isDead) {
+            this.takeDamage();
+          }
+        }
+      },
+      undefined,
+      this
+    );
 
     // Spike collision with death callback
     this.physics.add.overlap(
@@ -130,6 +170,22 @@ export class GameScene extends Phaser.Scene {
     this.input.keyboard!.on('keydown-I', () => {
       this.debugInvincible = !this.debugInvincible;
       this.game.events.emit('debugInvincibilityChanged', this.debugInvincible);
+    });
+  }
+
+  private spawnSlimes(): void {
+    const enemiesLayer = this.map.getObjectLayer('Enemies');
+    if (!enemiesLayer) return;
+
+    enemiesLayer.objects.forEach(enemyObj => {
+      if (enemyObj.type === 'slime' || enemyObj.name === 'Slime') {
+        const slime = new Slime(
+          this,
+          enemyObj.x! + (enemyObj.width || 0) / 2,
+          enemyObj.y! + (enemyObj.height || 0) / 2
+        );
+        this.slimes.add(slime);
+      }
     });
   }
 

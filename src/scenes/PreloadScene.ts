@@ -78,6 +78,16 @@ export class PreloadScene extends Phaser.Scene {
       frameWidth: 32,
       frameHeight: 32,
     });
+
+    // Load enemy sprites
+    this.load.spritesheet('slime-idle', 'assets/enemies/slime/Idle-Run.png', {
+      frameWidth: 44,
+      frameHeight: 30,
+    });
+    this.load.spritesheet('slime-hit', 'assets/enemies/slime/Hit.png', {
+      frameWidth: 44,
+      frameHeight: 30,
+    });
   }
 
   create(): void {
