@@ -25,14 +25,14 @@ export class GameScene extends Phaser.Scene {
 
     // Create layers
     this.groundLayer = this.map.createLayer('Ground', tileset)!;
-    this.groundLayer.setCollisionByProperty({ collides: true });
+    this.groundLayer.setCollisionBetween(1, 72); // All tiles can collide
 
     this.hiddenLayer = this.map.createLayer('Hidden', tileset)!;
     this.hiddenLayer.setVisible(false);
     // Don't enable collision yet - will be enabled when revealed
 
     this.spikesLayer = this.map.createLayer('Spikes', tileset)!;
-    this.spikesLayer.setCollisionByProperty({ deadly: true });
+    this.spikesLayer.setCollisionBetween(1, 72); // All spike tiles collide
 
     // Set world bounds to match map size
     this.physics.world.bounds.width = this.map.widthInPixels;
@@ -103,7 +103,7 @@ export class GameScene extends Phaser.Scene {
             this.hiddenLayer.setVisible(true);
             
             // Enable collision on hidden layer
-            this.hiddenLayer.setCollisionByProperty({ collides: true });
+            this.hiddenLayer.setCollisionBetween(1, 72);
             
             // Destroy the zone so it only triggers once
             zone.destroy();
