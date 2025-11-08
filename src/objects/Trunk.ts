@@ -131,16 +131,18 @@ export class Trunk extends Phaser.Physics.Arcade.Sprite {
       this.direction = 1;
     }
 
-    // Check for edges (raycast down in front of trunk)
-    const checkDistance = 30;
+    // Check for edges (raycast down in front of trunk) - check further ahead for trunk
+    const checkDistance = 40; // Check further ahead since trunk is wider
     const checkX = this.direction === 1 ? this.x + checkDistance : this.x - checkDistance;
-    const checkY = this.y + 16;
+    const checkY = this.y + 20; // Check below the trunk
 
     const tile = this.groundLayer.getTileAtWorldXY(checkX, checkY);
     
-    // If no tile ahead (edge detected), turn around
+    // If no tile ahead (edge detected), turn around immediately
     if (!tile || tile.index <= 0) {
       this.direction *= -1;
+      // Stop current velocity to prevent falling off
+      body.setVelocityX(0);
     }
 
     // Always face the player

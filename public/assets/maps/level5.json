@@ -11409,6 +11409,28 @@
      "width": 44,
      "x": 3128,
      "y": 208
+    },
+    {
+     "height": 32,
+     "id": 200,
+     "name": "Trunk",
+     "rotation": 0,
+     "type": "trunk",
+     "visible": true,
+     "width": 64,
+     "x": 1320.0,
+     "y": 208
+    },
+    {
+     "height": 32,
+     "id": 201,
+     "name": "Trunk",
+     "rotation": 0,
+     "type": "trunk",
+     "visible": true,
+     "width": 64,
+     "x": 2200.0,
+     "y": 208
     }
    ],
    "opacity": 1,
@@ -11442,7 +11464,7 @@
   }
  ],
  "nextlayerid": 8,
- "nextobjectid": 108,
+ "nextobjectid": 202,
  "orientation": "orthogonal",
  "renderorder": "right-down",
  "tiledversion": "1.11.0",
