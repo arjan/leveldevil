@@ -23,16 +23,11 @@ export class VictoryScene extends Phaser.Scene {
     victoryText.setOrigin(0.5);
 
     // Congratulations
-    const congratsText = this.add.text(
-      width / 2,
-      height / 2,
-      'You completed all 10 levels!',
-      {
-        fontFamily: 'Arial',
-        fontSize: '24px',
-        color: '#ffffff',
-      }
-    );
+    const congratsText = this.add.text(width / 2, height / 2, 'You completed all 10 levels!', {
+      fontFamily: 'Arial',
+      fontSize: '24px',
+      color: '#ffffff',
+    });
     congratsText.setOrigin(0.5);
 
     // Stats
@@ -45,16 +40,11 @@ export class VictoryScene extends Phaser.Scene {
     statsText.setOrigin(0.5);
 
     // Restart button
-    const restartText = this.add.text(
-      width / 2,
-      height / 2 + 90,
-      'Press SPACE to play again',
-      {
-        fontFamily: 'Arial',
-        fontSize: '18px',
-        color: '#00ff00',
-      }
-    );
+    const restartText = this.add.text(width / 2, height / 2 + 90, 'Press SPACE to play again', {
+      fontFamily: 'Arial',
+      fontSize: '18px',
+      color: '#00ff00',
+    });
     restartText.setOrigin(0.5);
 
     // Tween for victory text
@@ -70,13 +60,12 @@ export class VictoryScene extends Phaser.Scene {
     this.input.keyboard!.once('keydown-SPACE', () => {
       this.registry.set('currentLevel', 1);
       this.registry.set('totalDeaths', 0);
-      
+
       // Clear localStorage
       localStorage.setItem('leveldevil_currentLevel', '1');
       localStorage.setItem('leveldevil_totalDeaths', '0');
-      
+
       this.scene.start('GameScene');
     });
   }
 }
-

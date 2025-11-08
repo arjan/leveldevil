@@ -22,7 +22,10 @@ export class GameScene extends Phaser.Scene {
   create(): void {
     // Get current level from registry
     this.currentLevel = this.registry.get('currentLevel') || 1;
-    
+
+    // Reset level completion flag
+    this.levelCompleted = false;
+
     // Add background - fill the entire map area
     const bg = this.add.image(0, 0, 'background').setOrigin(0, 0);
     bg.setDisplaySize(this.cameras.main.width, this.cameras.main.height);
@@ -40,7 +43,7 @@ export class GameScene extends Phaser.Scene {
     // Create layers
     this.groundLayer = this.map.createLayer('Ground', tileset)!;
     const groundTiles = new Set<number>();
-    this.groundLayer.forEachTile((tile) => {
+    this.groundLayer.forEachTile(tile => {
       if (tile.index > 0) {
         groundTiles.add(tile.index);
       }
@@ -55,7 +58,7 @@ export class GameScene extends Phaser.Scene {
 
     this.spikesLayer = this.map.createLayer('Spikes', tileset)!;
     const spikeTiles = new Set<number>();
-    this.spikesLayer.forEachTile((tile) => {
+    this.spikesLayer.forEachTile(tile => {
       if (tile.index > 0) {
         spikeTiles.add(tile.index);
       }
@@ -72,12 +75,12 @@ export class GameScene extends Phaser.Scene {
     // Get player spawn point from object layer
     const spawns = this.map.getObjectLayer('Spawns');
     const spawnObj = spawns?.objects.find(obj => obj.name === 'PlayerSpawn');
-    
+
     if (spawnObj) {
       // Spawn at the center of the spawn object
-      this.spawnPoint = { 
-        x: spawnObj.x! + (spawnObj.width! / 2), 
-        y: spawnObj.y! + (spawnObj.height! / 2) 
+      this.spawnPoint = {
+        x: spawnObj.x! + spawnObj.width! / 2,
+        y: spawnObj.y! + spawnObj.height! / 2,
       };
     } else {
       // Fallback spawn
@@ -94,7 +97,7 @@ export class GameScene extends Phaser.Scene {
     // Setup collisions
     this.physics.add.collider(this.player, this.groundLayer);
     this.physics.add.collider(this.player, this.hiddenLayer);
-    
+
     // Spike collision with death callback
     this.physics.add.overlap(
       this.player,
@@ -119,10 +122,10 @@ export class GameScene extends Phaser.Scene {
     this.cameras.main.setBounds(0, 0, this.map.widthInPixels, this.map.heightInPixels);
     this.cameras.main.startFollow(this.player, true, 0.1, 0.1);
     // Center camera on player (no deadzone)
-    
+
     // Emit level change
     this.game.events.emit('levelChanged', this.currentLevel);
-    
+
     // Setup debug controls
     this.input.keyboard!.on('keydown-I', () => {
       this.debugInvincible = !this.debugInvincible;
@@ -143,7 +146,7 @@ export class GameScene extends Phaser.Scene {
           triggerObj.width!,
           triggerObj.height!
         );
-        
+
         this.physics.add.existing(zone, false);
 
         // Add overlap detection
@@ -153,14 +156,14 @@ export class GameScene extends Phaser.Scene {
           () => {
             // Reveal hidden layer
             this.hiddenLayer.setVisible(true);
-            
+
             // Enable collision on hidden layer
-            this.hiddenLayer.forEachTile((tile) => {
+            this.hiddenLayer.forEachTile(tile => {
               if (tile.index > 0) {
                 this.hiddenLayer.setCollision(tile.index);
               }
             });
-            
+
             // Destroy the zone so it only triggers once
             zone.destroy();
           },
@@ -182,7 +185,7 @@ export class GameScene extends Phaser.Scene {
         const goalWidth = goalObj.width || 64;
         const goalX = goalObj.x || 0;
         const goalY = (goalObj.y || 0) - goalHeight / 2;
-        
+
         // Create a zone for the goal area
         const zone = this.add.zone(
           goalX + goalWidth / 2,
@@ -190,7 +193,7 @@ export class GameScene extends Phaser.Scene {
           goalWidth,
           goalHeight
         );
-        
+
         this.physics.add.existing(zone, false);
         const zoneBody = zone.body as Phaser.Physics.Arcade.Body;
         zoneBody.setAllowGravity(false);
@@ -208,16 +211,16 @@ export class GameScene extends Phaser.Scene {
           undefined,
           this
         );
-        
+
         // Visual indicator for goal - make it more visible
         const goalGraphics = this.add.graphics();
-        goalGraphics.lineStyle(4, 0xFFD700);
-        goalGraphics.fillStyle(0xFFFF00, 0.5);
+        goalGraphics.lineStyle(4, 0xffd700);
+        goalGraphics.fillStyle(0xffff00, 0.5);
         goalGraphics.fillRect(goalX, goalY, goalWidth, goalHeight);
         goalGraphics.strokeRect(goalX, goalY, goalWidth, goalHeight);
-        
+
         // Add vertical stripes for extra visibility
-        goalGraphics.lineStyle(2, 0xFFD700, 0.7);
+        goalGraphics.lineStyle(2, 0xffd700, 0.7);
         for (let i = 0; i < goalWidth; i += 8) {
           goalGraphics.lineBetween(goalX + i, goalY, goalX + i, goalY + goalHeight);
         }
@@ -234,10 +237,10 @@ export class GameScene extends Phaser.Scene {
       // Next level
       this.currentLevel++;
       this.registry.set('currentLevel', this.currentLevel);
-      
+
       // Save to localStorage
       localStorage.setItem('leveldevil_currentLevel', this.currentLevel.toString());
-      
+
       this.scene.restart();
     }
   }
@@ -260,7 +263,7 @@ export class GameScene extends Phaser.Scene {
     } else {
       // Make invulnerable temporarily
       this.isInvulnerable = true;
-      
+
       // Flash player
       this.tweens.add({
         targets: this.player,
@@ -271,7 +274,7 @@ export class GameScene extends Phaser.Scene {
         onComplete: () => {
           this.player.setAlpha(1);
           this.isInvulnerable = false;
-        }
+        },
       });
     }
   }
@@ -279,17 +282,17 @@ export class GameScene extends Phaser.Scene {
   onDeath(): void {
     // Prevent multiple death triggers
     this.isDead = true;
-    
+
     // Track total deaths
     const totalDeaths = this.registry.get('totalDeaths') || 0;
     this.registry.set('totalDeaths', totalDeaths + 1);
-    
+
     // Save to localStorage
     localStorage.setItem('leveldevil_totalDeaths', (totalDeaths + 1).toString());
-    
+
     // Emit death event for UI
     this.game.events.emit('playerDeath');
-    
+
     // Respawn player
     this.time.delayedCall(1000, () => {
       if (this.player) {
@@ -303,4 +306,3 @@ export class GameScene extends Phaser.Scene {
     });
   }
 }
-
