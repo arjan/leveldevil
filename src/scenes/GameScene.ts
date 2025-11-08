@@ -26,24 +26,34 @@ export class GameScene extends Phaser.Scene {
 
     // Create layers
     this.groundLayer = this.map.createLayer('Ground', tileset)!;
-    // Only set collision on tiles that exist (forEachTile finds actual tiles)
+    // Set collision on all tiles in the Ground layer (tiles 1-72)
+    const groundTiles = new Set<number>();
     this.groundLayer.forEachTile((tile) => {
       if (tile.index > 0) {
-        this.groundLayer.setCollision(tile.index);
+        groundTiles.add(tile.index);
       }
     });
+    if (groundTiles.size > 0) {
+      this.groundLayer.setCollision(Array.from(groundTiles));
+      console.log('Ground collision tiles:', Array.from(groundTiles));
+    }
 
     this.hiddenLayer = this.map.createLayer('Hidden', tileset)!;
     this.hiddenLayer.setVisible(false);
     // Don't enable collision yet - will be enabled when revealed
 
     this.spikesLayer = this.map.createLayer('Spikes', tileset)!;
-    // Only set collision on tiles that exist
+    // Set collision on spike tiles
+    const spikeTiles = new Set<number>();
     this.spikesLayer.forEachTile((tile) => {
       if (tile.index > 0) {
-        this.spikesLayer.setCollision(tile.index);
+        spikeTiles.add(tile.index);
       }
     });
+    if (spikeTiles.size > 0) {
+      this.spikesLayer.setCollision(Array.from(spikeTiles));
+      console.log('Spike collision tiles:', Array.from(spikeTiles));
+    }
     this.spikesLayer.setTint(0xff4444); // Red tint to make spikes visible
 
     // Set world bounds to match map size
