@@ -50,7 +50,7 @@ export class GameScene extends Phaser.Scene {
 
     // Get background name from map properties
     let backgroundName = 'Blue'; // Default
-    if (this.map.properties) {
+    if (this.map.properties && Array.isArray(this.map.properties)) {
       const bgProp = this.map.properties.find((p: any) => p.name === 'background');
       if (bgProp) {
         backgroundName = bgProp.value;

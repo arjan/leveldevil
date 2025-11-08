@@ -47,8 +47,8 @@ export class PreloadScene extends Phaser.Scene {
     // Load tilemap and tileset
     this.load.image('terrain-tileset', 'assets/tiles/terrain.png');
     
-    // Load all 10 levels
-    for (let i = 1; i <= 10; i++) {
+    // Load all 11 levels (10 regular + 1 boss level)
+    for (let i = 1; i <= 11; i++) {
       this.load.tilemapTiledJSON(`level${i}`, `assets/maps/level${i}.json`);
     }
 
