@@ -89,6 +89,8 @@ export class MushroomBoss extends Phaser.Physics.Arcade.Sprite {
 
     // Only move if on ground
     if (!body.blocked.down) {
+      // If falling, stop horizontal movement
+      body.setVelocityX(0);
       return;
     }
 
@@ -96,7 +98,32 @@ export class MushroomBoss extends Phaser.Physics.Arcade.Sprite {
     this.attackTimer += delta;
     this.jumpTimer += delta;
 
-    // Patrol movement (faster when attacking)
+    // Check for edges BEFORE moving (raycast down in front) - boss is 4x larger, needs more distance
+    const checkDistance = 80; // Much further ahead for large boss
+    const checkX = this.direction === 1 ? this.x + checkDistance : this.x - checkDistance;
+    const checkY = this.y + 60; // Check well below the large boss
+
+    const tile = this.groundLayer.getTileAtWorldXY(checkX, checkY);
+
+    // If no tile ahead (edge detected), turn around and don't move
+    if (!tile || tile.index <= 0) {
+      this.direction *= -1;
+      body.setVelocityX(0);
+      return; // Don't move this frame
+    }
+
+    // Check for walls
+    if (body.blocked.right && this.direction === 1) {
+      this.direction = -1;
+      body.setVelocityX(0);
+      return;
+    } else if (body.blocked.left && this.direction === -1) {
+      this.direction = 1;
+      body.setVelocityX(0);
+      return;
+    }
+
+    // Safe to move - patrol movement (faster when attacking)
     const currentSpeed = this.isAttacking ? this.speed * 2 : this.speed;
     body.setVelocityX(currentSpeed * this.direction);
 
@@ -112,27 +139,6 @@ export class MushroomBoss extends Phaser.Physics.Arcade.Sprite {
       if (this.anims.currentAnim?.key !== 'mushroom-idle') {
         this.play('mushroom-idle');
       }
-    }
-
-    // Check for walls
-    if (body.blocked.right && this.direction === 1) {
-      this.direction = -1;
-    } else if (body.blocked.left && this.direction === -1) {
-      this.direction = 1;
-    }
-
-    // Check for edges (raycast down in front) - boss is 4x larger, needs more distance
-    const checkDistance = 80; // Much further ahead for large boss
-    const checkX = this.direction === 1 ? this.x + checkDistance : this.x - checkDistance;
-    const checkY = this.y + 60; // Check well below the large boss
-
-    const tile = this.groundLayer.getTileAtWorldXY(checkX, checkY);
-
-    // If no tile ahead (edge detected), turn around immediately
-    if (!tile || tile.index <= 0) {
-      this.direction *= -1;
-      // Stop current velocity immediately to prevent falling off
-      body.setVelocityX(0);
     }
 
     // Special attack: Speed boost every 3 seconds
