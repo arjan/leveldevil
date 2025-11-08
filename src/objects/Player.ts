@@ -105,6 +105,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
     const body = this.body as Phaser.Physics.Arcade.Body;
     const onGround = body.blocked.down || body.touching.down;
 
+    // Get virtual controls from UIScene if available
+    const uiScene = this.scene.scene.get('UIScene') as any;
+    const virtualLeft = uiScene?.virtualLeft || false;
+    const virtualRight = uiScene?.virtualRight || false;
+    const virtualJump = uiScene?.virtualJump || false;
+
     // Update coyote time
     if (onGround) {
       this.coyoteTimeCounter = this.COYOTE_TIME;
@@ -112,11 +118,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       this.coyoteTimeCounter -= delta;
     }
 
-    // Update jump buffer
+    // Update jump buffer (keyboard or virtual controls)
     const jumpPressed =
       Phaser.Input.Keyboard.JustDown(this.cursors.up!) ||
       Phaser.Input.Keyboard.JustDown(this.cursors.space!) ||
-      Phaser.Input.Keyboard.JustDown(this.wasd.up);
+      Phaser.Input.Keyboard.JustDown(this.wasd.up) ||
+      (virtualJump && this.jumpBufferCounter <= 0); // Virtual jump triggers buffer
 
     if (jumpPressed) {
       this.jumpBufferCounter = this.JUMP_BUFFER_TIME;
@@ -124,9 +131,9 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       this.jumpBufferCounter -= delta;
     }
 
-    // Handle horizontal movement
-    const left = this.cursors.left?.isDown || this.wasd.left.isDown;
-    const right = this.cursors.right?.isDown || this.wasd.right.isDown;
+    // Handle horizontal movement (keyboard or virtual controls)
+    const left = this.cursors.left?.isDown || this.wasd.left.isDown || virtualLeft;
+    const right = this.cursors.right?.isDown || this.wasd.right.isDown || virtualRight;
 
     if (left) {
       body.setVelocityX(-this.SPEED);
@@ -150,9 +157,12 @@ export class Player extends Phaser.Physics.Arcade.Sprite {
       this.coyoteTimeCounter = 0;
     }
 
-    // Variable jump height
+    // Variable jump height (keyboard or virtual controls)
     const jumpHeld =
-      this.cursors.up?.isDown || this.cursors.space?.isDown || this.wasd.up.isDown;
+      this.cursors.up?.isDown ||
+      this.cursors.space?.isDown ||
+      this.wasd.up.isDown ||
+      virtualJump;
 
     if (this.isJumping) {
       const jumpDuration = time - this.jumpPressTime;

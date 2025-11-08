@@ -3,6 +3,17 @@ import Phaser from 'phaser';
 export class UIScene extends Phaser.Scene {
   private deathCount: number = 0;
   private deathText!: Phaser.GameObjects.Text;
+  
+  // Mobile controls
+  private leftButton!: Phaser.GameObjects.Graphics;
+  private rightButton!: Phaser.GameObjects.Graphics;
+  private jumpButton!: Phaser.GameObjects.Graphics;
+  private isMobile: boolean = false;
+
+  // Virtual input states (accessible by GameScene if needed)
+  public virtualLeft: boolean = false;
+  public virtualRight: boolean = false;
+  public virtualJump: boolean = false;
 
   constructor() {
     super({ key: 'UIScene' });
@@ -20,8 +31,148 @@ export class UIScene extends Phaser.Scene {
     this.deathText.setScrollFactor(0);
     this.deathText.setDepth(1000);
 
+    // Detect if mobile/touch device
+    this.isMobile = this.sys.game.device.input.touch;
+
+    // Setup mobile controls if on touch device
+    if (this.isMobile || this.sys.game.device.os.android || this.sys.game.device.os.iOS) {
+      this.setupMobileControls();
+    }
+
     // Listen for death events from GameScene
     this.game.events.on('playerDeath', this.onPlayerDeath, this);
+  }
+
+  private setupMobileControls(): void {
+    const width = this.cameras.main.width;
+    const height = this.cameras.main.height;
+    const buttonSize = 60;
+    const buttonAlpha = 0.4;
+
+    // Left button
+    this.leftButton = this.add.graphics();
+    this.leftButton.fillStyle(0x444444, buttonAlpha);
+    this.leftButton.fillRoundedRect(20, height - buttonSize - 20, buttonSize, buttonSize, 10);
+    this.leftButton.fillStyle(0xffffff, 0.8);
+    this.leftButton.fillTriangle(
+      35, height - 50,
+      55, height - 40,
+      55, height - 60
+    );
+    this.leftButton.setScrollFactor(0);
+    this.leftButton.setDepth(1000);
+    this.leftButton.setInteractive(
+      new Phaser.Geom.Rectangle(20, height - buttonSize - 20, buttonSize, buttonSize),
+      Phaser.Geom.Rectangle.Contains
+    );
+
+    // Right button
+    this.rightButton = this.add.graphics();
+    this.rightButton.fillStyle(0x444444, buttonAlpha);
+    this.rightButton.fillRoundedRect(100, height - buttonSize - 20, buttonSize, buttonSize, 10);
+    this.rightButton.fillStyle(0xffffff, 0.8);
+    this.rightButton.fillTriangle(
+      145, height - 50,
+      125, height - 40,
+      125, height - 60
+    );
+    this.rightButton.setScrollFactor(0);
+    this.rightButton.setDepth(1000);
+    this.rightButton.setInteractive(
+      new Phaser.Geom.Rectangle(100, height - buttonSize - 20, buttonSize, buttonSize),
+      Phaser.Geom.Rectangle.Contains
+    );
+
+    // Jump button (right side)
+    this.jumpButton = this.add.graphics();
+    this.jumpButton.fillStyle(0x444444, buttonAlpha);
+    this.jumpButton.fillRoundedRect(
+      width - buttonSize - 20,
+      height - buttonSize - 20,
+      buttonSize,
+      buttonSize,
+      10
+    );
+    this.jumpButton.fillStyle(0xffffff, 0.8);
+    this.jumpButton.fillCircle(width - buttonSize / 2 - 20, height - buttonSize / 2 - 20, 15);
+    this.jumpButton.setScrollFactor(0);
+    this.jumpButton.setDepth(1000);
+    this.jumpButton.setInteractive(
+      new Phaser.Geom.Rectangle(
+        width - buttonSize - 20,
+        height - buttonSize - 20,
+        buttonSize,
+        buttonSize
+      ),
+      Phaser.Geom.Rectangle.Contains
+    );
+
+    // Setup touch events
+    this.leftButton.on('pointerdown', () => {
+      this.virtualLeft = true;
+      this.leftButton.clear();
+      this.leftButton.fillStyle(0x666666, buttonAlpha + 0.2);
+      this.leftButton.fillRoundedRect(20, height - buttonSize - 20, buttonSize, buttonSize, 10);
+      this.leftButton.fillStyle(0xffffff, 0.8);
+      this.leftButton.fillTriangle(35, height - 50, 55, height - 40, 55, height - 60);
+    });
+
+    this.leftButton.on('pointerup', () => {
+      this.virtualLeft = false;
+      this.leftButton.clear();
+      this.leftButton.fillStyle(0x444444, buttonAlpha);
+      this.leftButton.fillRoundedRect(20, height - buttonSize - 20, buttonSize, buttonSize, 10);
+      this.leftButton.fillStyle(0xffffff, 0.8);
+      this.leftButton.fillTriangle(35, height - 50, 55, height - 40, 55, height - 60);
+    });
+
+    this.rightButton.on('pointerdown', () => {
+      this.virtualRight = true;
+      this.rightButton.clear();
+      this.rightButton.fillStyle(0x666666, buttonAlpha + 0.2);
+      this.rightButton.fillRoundedRect(100, height - buttonSize - 20, buttonSize, buttonSize, 10);
+      this.rightButton.fillStyle(0xffffff, 0.8);
+      this.rightButton.fillTriangle(145, height - 50, 125, height - 40, 125, height - 60);
+    });
+
+    this.rightButton.on('pointerup', () => {
+      this.virtualRight = false;
+      this.rightButton.clear();
+      this.rightButton.fillStyle(0x444444, buttonAlpha);
+      this.rightButton.fillRoundedRect(100, height - buttonSize - 20, buttonSize, buttonSize, 10);
+      this.rightButton.fillStyle(0xffffff, 0.8);
+      this.rightButton.fillTriangle(145, height - 50, 125, height - 40, 125, height - 60);
+    });
+
+    this.jumpButton.on('pointerdown', () => {
+      this.virtualJump = true;
+      this.jumpButton.clear();
+      this.jumpButton.fillStyle(0x666666, buttonAlpha + 0.2);
+      this.jumpButton.fillRoundedRect(
+        width - buttonSize - 20,
+        height - buttonSize - 20,
+        buttonSize,
+        buttonSize,
+        10
+      );
+      this.jumpButton.fillStyle(0xffffff, 0.8);
+      this.jumpButton.fillCircle(width - buttonSize / 2 - 20, height - buttonSize / 2 - 20, 15);
+    });
+
+    this.jumpButton.on('pointerup', () => {
+      this.virtualJump = false;
+      this.jumpButton.clear();
+      this.jumpButton.fillStyle(0x444444, buttonAlpha);
+      this.jumpButton.fillRoundedRect(
+        width - buttonSize - 20,
+        height - buttonSize - 20,
+        buttonSize,
+        buttonSize,
+        10
+      );
+      this.jumpButton.fillStyle(0xffffff, 0.8);
+      this.jumpButton.fillCircle(width - buttonSize / 2 - 20, height - buttonSize / 2 - 20, 15);
+    });
   }
 
   onPlayerDeath(): void {
